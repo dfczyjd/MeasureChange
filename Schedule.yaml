@@ -1,0 +1,23 @@
+- Schedule:
+  # Required
+  - Effective Period:
+      Process Configuration Parameter:
+        Actions:
+        - value change
+        Desc: range of dates to be active
+  - Present Value:
+      Process Configuration Parameter (?):
+        Actions:
+        - value change
+        Desc: scheduled value
+  # Optional
+  - Exception Schedule:
+      Process Configuration Parameter:
+        Actions:
+        - value change
+        Desc: schedules for exceptional days
+  - Weekly Schedule:
+      Process Configuration Parameter:
+        Actions:
+        - value change
+        Desc: schedules for weekdays
