@@ -1,0 +1,20 @@
+- Event Enrollment:
+  - Event Enable:
+      Alarm Suppression:
+        Actions:
+        - activate/deactivate
+        Desc: several flags enabling events/alarms by their types
+  - Notify Type:
+      Alarm Suppression:
+        Actions:
+        - activate/deactivate
+        Desc: toggles between event and alarm types for notifications
+  ########
+  - Notification Class (?):
+      Alarm Priority:
+      Alarm Ack Required:
+  - Priority:
+      Alarm Priority:
+        Actions:
+        - value change
+        Desc: priority for events/alarms

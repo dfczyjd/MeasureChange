@@ -1,0 +1,11 @@
+- Notification Class:
+  - Ack Required:
+      Alarm Ack Required:
+        Actions:
+        - value change
+        Desc: several flags enabling acks to events/alarms by their types
+  - Priority:
+      Alarm Priority:
+        Actions:
+        - value change
+        Desc: several values indicating priorities for events/alarms by their types
