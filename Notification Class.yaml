@@ -1,4 +1,5 @@
 - Notification Class:
+  # Required
   - Ack Required:
       Alarm Ack Required:
         Actions:
@@ -9,3 +10,4 @@
         Actions:
         - value change
         Desc: several values indicating priorities for events/alarms by their types
+

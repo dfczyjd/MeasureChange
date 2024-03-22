@@ -1,41 +1,41 @@
-- Binary Input:
+- Multistate Output:
   # Required
-  - Polarity:
-      Device Diagnostics:
+  - Number of States:
+      Process Variable Out:
         Actions:
         - config change
-        Desc: inverts the meaning behind active/inactive states in Present Value
-  - Present Value:
-      Process Input Variable:
-        Actions:
-        - override
-        Desc: writing to attribute implies override action
-  # Optional
-  - Active Text:
-      Human Info:
+        Desc: number of possible states
+  - Out of Service:
+      Device Control:
         Actions:
         - value change
-        Desc: helper text displayed in the active state
-  - Alarm Value:
-      Alarm Condition:
+        Desc: on/off state of hardware
+  - Priority Array:
+      Process variable Out:
         Actions:
-        - tighten/relax
-        Desc: boundary for Present Value to raise an event/alarm
+        - config change
+        Desc: commands to define output value
+  - Relinquish Default:
+      Process Variable Out:
+        Actions:
+        - config change
+        Desc: default output value
+  # Optional
   - Device Type:
       Human Info:
         Actions:
         - value change
-        Desc: device description
+        Desc: description of the connected device
   - Event Enable:
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
-  - Inactive Text:
-      Human Info:
+  - Feedback Value:
+      Alarm Condition:
         Actions:
-        - value change
-        Desc: helper text displayed in the inactive state
+        - tighten/relax
+        Desc: threshold for output value to generate an alert
   - Notification Class (?):
       Alarm Priority:
       Alarm Ack Required:
@@ -54,6 +54,11 @@
         - add/delete (?)
         - value change
         Desc: specifies the reason of value's unreliability, if any
+  - State Text:
+      Human Info:
+        Actions:
+        - value change
+        Desc: state descriptions
   - Time Delay:
       Alarm Condition:
         Actions:

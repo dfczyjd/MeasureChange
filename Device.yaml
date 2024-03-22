@@ -1,0 +1,98 @@
+- Device:
+  # Required
+  - APDU Timeout:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: protocol messages timeout
+  - Application Software Version:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: software version
+  - Firmware Revision:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: firmware version
+  - Number of APDU Retries:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: number of protocol message retries
+  - Object List:
+      TODO: come up with a way to reference other objects here
+        Actions:
+        - add/delete
+  - Object Name:
+      Human Info:
+        Actions:
+        - value change
+        Desc: device name
+  - Protocol Revision:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: protocol minor revision level
+  - Protocol Version:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: protocol version
+  # Optional
+  - Active COV Supscriptions:
+      Monitoring Push Configuration:
+        Actions:
+        - activate/deactivate
+        - tighten/relax
+        Desc: list of COV recepients
+  - APDU Segment Timeout:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: protocol message segment timeout
+  - Backup Failure Timeout (Do we need it?):
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: timeout for backup or restoration procedure to fail
+  - Daylight Savings Status:
+      Process Control Variable:
+        Actions:
+        - value change
+        Desc: toggles daylight saving time
+  - Description:
+      Human Info:
+        Actions:
+        - value change
+        Desc: device description
+  - Location:
+      Human Info (?):
+        Actions:
+        - value change
+        Desc: device location
+  - Max Info Frames:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: maximum number of frames before MS/TP token
+  - Max Master:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: highest possible address for master MS/TP nodes
+  - Max Segments Accepted:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: maximum number of protocol segments accepted 
+  - Profile Name:
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of device's object profile
+  - Time Synchronization Recepients:
+      Monitoring Push Configuration:
+        Actions:
+        - tighten/relax
+        Desc: list of recepients of Time Synchronization request

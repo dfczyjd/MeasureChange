@@ -1,4 +1,5 @@
 - Event Enrollment:
+  # Required
   - Event Enable:
       Alarm Suppression:
         Actions:
@@ -9,7 +10,7 @@
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
-  ########
+  # Optional
   - Notification Class (?):
       Alarm Priority:
       Alarm Ack Required:

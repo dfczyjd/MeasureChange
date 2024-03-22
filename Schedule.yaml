@@ -5,8 +5,19 @@
         Actions:
         - value change
         Desc: range of dates to be active
+  - List of Object Property References:
+      Process Configuration Parameter:
+        Actions:
+        - add/delete
+        - value change
+        Desc: objects to apply the schedule
+  - Priority for Writing:
+      Process Configuration Parameter:
+        Actions:
+        - value change
+        Desc: priority for writing scheduled value
   - Present Value:
-      Process Configuration Parameter (?):
+      Process Configuration Parameter:
         Actions:
         - value change
         Desc: scheduled value
