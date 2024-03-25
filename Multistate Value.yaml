@@ -1,41 +1,26 @@
-- Multistate Output:
+- Multistate Value:
   # Required
-  - Number of States:
-      Process Output Variable:
-        Actions:
-        - config change
-        Desc: number of possible states
   - Out of Service:
       Device Control:
         Actions:
         - value change
         Desc: on/off state of hardware
-  - Priority Array:
-      Process Output Variable:
-        Actions:
-        - config change
-        Desc: commands to define output value
-  - Relinquish Default:
-      Process Output Variable:
-        Actions:
-        - config change
-        Desc: default output value
   # Optional
-  - Device Type:
-      Human Info:
+  - Alarm Values:
+      Alarm Condition:
         Actions:
-        - value change
-        Desc: description of the connected device
+        - tighten/relax
+        Desc: states that trigger an event/alarm upon staying for too long
   - Event Enable:
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
-  - Feedback Value:
+  - Fault Values:
       Alarm Condition:
         Actions:
         - tighten/relax
-        Desc: threshold for output value to generate an alert
+        Desc: states that trigger an event/alarm upon staying for too long
   - Notification Class (*):
       Alarm Priority:
       Alarm Ack Required:
@@ -44,15 +29,6 @@
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
-  - Reliability:
-      Process Output Variable:
-        Actions:
-        - config change
-        Desc: indicates whether the value is reliable
-      Human Info:
-        Actions:
-        - value change
-        Desc: specifies the reason of value's unreliability, if any
   - State Text:
       Human Info:
         Actions:

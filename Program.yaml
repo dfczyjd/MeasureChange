@@ -1,0 +1,37 @@
+- Program:
+  # Required
+  - Out of Service:
+      Device Control:
+        Actions:
+        - value change
+        Desc: on/off state of hardware
+  - Program Change:
+      Device Control:
+        Actions:
+        - value change
+        Desc: controls the program updating/restarting process
+  # Optional
+  - Description:
+      Human Info:
+        Actions:
+        - value change
+        Desc: device description
+  - Instance Of:
+      Process Configuration Parameter:
+        Actions:
+        - value change
+        Desc: name of the running program
+  - Program Location:
+      Process Configuration Parameter:
+        Actions:
+        - value change
+        Desc: location of the running program
+  - Reliability:
+      Device Control:
+        Actions:
+        - config change
+        Desc: indicates whether the values of several attribute are reliable
+      Human Info:
+        Actions:
+        - value change
+        Desc: specifies the reason of values' unreliability, if any

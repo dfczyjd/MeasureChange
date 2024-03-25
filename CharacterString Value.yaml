@@ -1,27 +1,17 @@
-- Binary Input:
+- CharacterString Value:
   # Required
-  - Polarity:
-      Device Diagnostics:
-        Actions:
-        - config change
-        Desc: inverts the meaning behind active/inactive states in Present Value
   - Present Value:
       Process Input Variable:
         Actions:
         - override
         Desc: writing to attribute implies override action
   # Optional
-  - Active Text:
-      Human Info:
-        Actions:
-        - value change
-        Desc: helper text displayed in the active state
-  - Alarm Value:
+  - Alarm Values:
       Alarm Condition:
         Actions:
         - tighten/relax
-        Desc: boundary for Present Value to raise an event/alarm
-  - Device Type:
+        Desc: values for Present Value to raise an event/alarm
+  - Description:
       Human Info:
         Actions:
         - value change
@@ -31,11 +21,11 @@
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
-  - Inactive Text:
-      Human Info:
+  - Fault Values:
+      Alarm Condition:
         Actions:
-        - value change
-        Desc: helper text displayed in the inactive state
+        - tighten/relax
+        Desc: values for Present Value to raise an event/alarm
   - Notification Class (*):
       Alarm Priority:
       Alarm Ack Required:
@@ -44,8 +34,18 @@
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
+  - Out of Service:
+      Device Control:
+        Actions:
+        - value change
+        Desc: on/off state of hardware
+  - Priority Array:
+      Process Output Variable:
+        Actions:
+        - config change
+        Desc: commands to define output value
   - Reliability:
-      Process Input Variable:
+      Process Output Variable:
         Actions:
         - config change
         Desc: indicates whether the value is reliable
@@ -53,6 +53,11 @@
         Actions:
         - value change
         Desc: specifies the reason of value's unreliability, if any
+  - Relinquish Default:
+      Process Output Variable:
+        Actions:
+        - config change
+        Desc: default output value
   - Time Delay:
       Alarm Condition:
         Actions:
