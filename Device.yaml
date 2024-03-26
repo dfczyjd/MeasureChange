@@ -51,11 +51,16 @@
         Actions:
         - value change
         Desc: protocol message segment timeout
-  - Backup Failure Timeout (Do we need it?):
+  - Backup Failure Timeout:
       Device Configuration:
         Actions:
         - value change
         Desc: timeout for backup or restoration procedure to fail
+  - Configuration Files:
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: files to be used in backup procedure
   - Daylight Savings Status:
       Process Control Variable:
         Actions:
@@ -66,8 +71,14 @@
         Actions:
         - value change
         Desc: device description
+  - List of Session Keys:
+      Device Configuration:
+        Actions:
+        - add/delete
+        - value change
+        Desc: list of cryptographic session keys
   - Location:
-      Human Info (?):
+      Human Info:
         Actions:
         - value change
         Desc: device location
@@ -85,7 +96,7 @@
       Device Configuration:
         Actions:
         - value change
-        Desc: maximum number of protocol segments accepted 
+        Desc: maximum number of protocol segments accepted
   - Profile Name:
       Human Info:
         Actions:

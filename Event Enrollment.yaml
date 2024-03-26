@@ -11,7 +11,12 @@
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   # Optional
-  - Notification Class (?):
+  - Issue Confirmed Notifications:
+      Alarm Ack Required:
+        Actions:
+        - value change
+        Desc: toggles notifications as confirmed/unconfirmed
+  - Notification Class (*):
       Alarm Priority:
       Alarm Ack Required:
   - Priority:
@@ -19,3 +24,8 @@
         Actions:
         - value change
         Desc: priority for events/alarms
+  - Recepient:
+      Monitoring Push Configuration (?):
+        Actions:
+        - value change
+        Desc: recepient of the notification
