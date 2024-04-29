@@ -1,39 +1,10 @@
-- CharacterString Value:
+Multistate Output:
   # Required
-  - Present Value:
-      Process Input Variable:
+  - Number of States:
+      Process Output Variable:
         Actions:
-        - override
-        Desc: writing to attribute implies override action
-  # Optional
-  - Alarm Values:
-      Alarm Condition:
-        Actions:
-        - tighten/relax
-        Desc: values for Present Value to raise an event/alarm
-  - Description:
-      Human Info:
-        Actions:
-        - value change
-        Desc: device description
-  - Event Enable:
-      Alarm Suppression:
-        Actions:
-        - activate/deactivate
-        Desc: several flags enabling events/alarms by their types
-  - Fault Values:
-      Alarm Condition:
-        Actions:
-        - tighten/relax
-        Desc: values for Present Value to raise an event/alarm
-  - Notification Class (*):
-      Alarm Priority:
-      Alarm Ack Required:
-  - Notify Type:
-      Alarm Suppression:
-        Actions:
-        - activate/deactivate
-        Desc: toggles between event and alarm types for notifications
+        - config change
+        Desc: number of possible states
   - Out of Service:
       Device Control:
         Actions:
@@ -44,6 +15,35 @@
         Actions:
         - config change
         Desc: commands to define output value
+  - Relinquish Default:
+      Process Output Variable:
+        Actions:
+        - config change
+        Desc: default output value
+  # Optional
+  - Device Type:
+      Human Info:
+        Actions:
+        - value change
+        Desc: description of the connected device
+  - Event Enable:
+      Alarm Suppression:
+        Actions:
+        - activate/deactivate
+        Desc: several flags enabling events/alarms by their types
+  - Feedback Value:
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: threshold for output value to generate an alert
+  - Notification Class (*):
+      Alarm Priority:
+      Alarm Ack Required:
+  - Notify Type:
+      Alarm Suppression:
+        Actions:
+        - activate/deactivate
+        Desc: toggles between event and alarm types for notifications
   - Reliability:
       Process Output Variable:
         Actions:
@@ -53,11 +53,11 @@
         Actions:
         - value change
         Desc: specifies the reason of value's unreliability, if any
-  - Relinquish Default:
-      Process Output Variable:
+  - State Text:
+      Human Info:
         Actions:
-        - config change
-        Desc: default output value
+        - value change
+        Desc: state descriptions
   - Time Delay:
       Alarm Condition:
         Actions:

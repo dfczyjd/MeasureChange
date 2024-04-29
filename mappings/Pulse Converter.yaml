@@ -1,4 +1,4 @@
-- Pulse Converter:
+Pulse Converter:
   # Required
   - Adjust Value:
       Process Input Variable:
@@ -29,7 +29,7 @@
   - COV Increment:
       Monitoring Push Configuration:
         Actions:
-        - value change
+        - tighten/relax
         Desc: minimum change in value to send a change-of-value notification
   - COV Period:
       Monitoring Push Configuration:
@@ -57,7 +57,7 @@
         - tighten/relax
         Desc: upper bound for Present Value to raise an event/alarm
   - Input Reference:
-      Monitoring Pull Configuration(?):
+      Monitoring Pull Configuration:
         Actions:
         - activate/deactivate
         Desc: reference to property containing actual value

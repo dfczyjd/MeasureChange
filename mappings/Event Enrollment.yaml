@@ -1,4 +1,4 @@
-- Event Enrollment:
+Event Enrollment:
   # Required
   - Event Enable:
       Alarm Suppression:
@@ -25,7 +25,7 @@
         - value change
         Desc: priority for events/alarms
   - Recepient:
-      Monitoring Push Configuration (?):
+      Monitoring Push Configuration:
         Actions:
-        - value change
+        - activate/deactivate
         Desc: recepient of the notification

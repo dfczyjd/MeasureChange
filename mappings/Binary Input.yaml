@@ -1,4 +1,4 @@
-- Binary Input:
+Binary Input:
   # Required
   - Polarity:
       Device Diagnostics:
@@ -36,7 +36,7 @@
         Actions:
         - value change
         Desc: helper text displayed in the inactive state
-  - Notification Class (*):
+  - Notification Class:
       Alarm Priority:
       Alarm Ack Required:
   - Notify Type:

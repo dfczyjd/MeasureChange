@@ -1,4 +1,4 @@
-- Notification Class:
+Notification Class:
   # Required
   - Ack Required:
       Alarm Ack Required:
@@ -11,8 +11,8 @@
         - value change
         Desc: several values indicating priorities for events/alarms by their types
   - Recepient List:
-      Monitoring Push Configuration (?):
+      Monitoring Push Configuration:
         Actions:
-        - add/delete
-        - value change
+        - activate/deactivate
+        - tighten/relax
         Desc: list or recepients for events/alarms

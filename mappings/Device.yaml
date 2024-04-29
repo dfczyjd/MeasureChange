@@ -1,4 +1,4 @@
-- Device:
+Device:
   # Required
   - APDU Timeout:
       Device Configuration:
@@ -21,7 +21,8 @@
         - value change
         Desc: number of protocol message retries
   - Object List:
-      TODO: come up with a way to reference other objects here
+      #TODO: come up with a way to reference other objects here
+      Unknown:
         Actions:
         - add/delete
   - Object Name:
@@ -40,7 +41,7 @@
         - value change
         Desc: protocol version
   # Optional
-  - Active COV Supscriptions:
+  - Active COV Subscriptions:
       Monitoring Push Configuration:
         Actions:
         - activate/deactivate
@@ -102,7 +103,7 @@
         Actions:
         - value change
         Desc: name of device's object profile
-  - Time Synchronization Recepients:
+  - Time Synchronization Recipients:
       Monitoring Push Configuration:
         Actions:
         - tighten/relax
