@@ -1,38 +1,99 @@
+import yaml
 import time
 import BAC0
 from BAC0.core.io.IOExceptions import UnknownPropertyError
+from os import scandir
+
+from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
+#from bacpypes.primitivedata import ObjectIdentifier
 
 # Config
-probe_ip = '192.168.183.2'
-ip_whitelist = [
-    '192.168.183.1',
-    '192.168.183.3'
-]
-device_delay = 0.005
-cycle_delay = 1
+DEBUG = True
 
+if DEBUG:
+    probe_ip = '192.168.183.2'
+    ip_whitelist = [
+        '192.168.183.1',
+        '192.168.183.3'        
+    ]
+    BAC0.log_level('debug')
+else:
+    probe_ip = '131.155.223.49'
+    ip_whitelist = [
+        '131.155.70.40',
+        '131.155.70.41'
+    ]
+device_delay = 0.005
+cycle_delay = 5
+output_filename = 'data.txt'
+
+# TODO: find how devices name stuff and fix in mappings
+object_names = dict([(x.lower(), x) for x in ObjectTypesSupported().bitNames.keys()])
+prop_names = dict([(x.lower(), x) for x in PropertyIdentifier().enumerations.keys()])
+
+def convert_mapping_name(name):
+    name_lower = ''.join(name.split()).lower()
+    if name_lower in object_names:
+        return object_names[name_lower]
+    if name_lower in prop_names:
+        return prop_names[name_lower]
+    return name
+
+def update_names(obj):
+    if type(obj) is list:
+        res_list = []
+        for elem in obj:
+            res_list.append(update_names(elem))
+        if type(res_list[0]) is dict:
+            res = dict()
+            for elem in res_list:
+                res.update(elem)
+            return res
+        return res_list
+    if type(obj) is dict:
+        res = dict()
+        for key in obj:
+            res[convert_mapping_name(key)] = update_names(obj[key])
+        return res
+    return obj
+
+mappings = dict()
+for file in scandir('../mappings'):
+    if not file.name.endswith('.yaml'):
+        continue
+    with open(file, 'r') as fin:
+        obj = yaml.safe_load(fin)
+        mappings.update(update_names(obj))
 
 bacnet = BAC0.lite(ip=probe_ip)
 
 for ip in ip_whitelist:
-    bacnet.discover(limits=(ip,'0 4194303'), global_broadcast=False)
+    bacnet.discover(limits=(ip, ''), global_broadcast=False)
 devices = dict()
+print('Found', bacnet.discoveredDevices)
 for dev in bacnet.discoveredDevices:
-    devices[dev] = bacnet.read(f'{dev[0]} device {dev[1]} objectList')
-try:
-    while True:
-        print('Cycle begin', flush=True)
-        for device, objects in devices.items():
-            print(device, end=': \n')
-            for obj in objects:
-                print('  ' + obj[0], obj[1], sep=':', end=': ')
+    objects = bacnet.read(f'{dev[0]} device {dev[1]} objectList')
+    print('Objects on device:', objects)
+    devices[dev] = objects
+print('Devices:', devices)
+if len(devices) == 0:
+    print('Fail')
+with open(output_filename, 'a') as fout:
+    print(time.strftime('%Y/%M/%d %H:%M:%S', time.localtime()), file=fout)
+    for device, objects in devices.items():
+        print(device, end=': \n')
+        for obj in objects:
+            if obj[0] not in mappings:
+                print('Skipping object type', obj[0], '(mapping not implemented)', file=fout)
+                continue
+            print(obj[0], obj[1], sep=':', end=':\n', file=fout)
+            mapping = mappings[obj[0]]
+            for key in mapping:
+                print('  ' + key, end=': ', file=fout)
                 try:
-                    print(bacnet.read(f'{device[0]} {obj[0]} {obj[1]} presentValue'), flush=True)
+                    print(bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}'), file=fout)
                 except UnknownPropertyError:
-                    print('property unavailable', flush=True)
-            time.sleep(device_delay)
-        time.sleep(cycle_delay)
-except KeyboardInterrupt:
-    pass
+                    print('property unavailable', file=fout)
+        time.sleep(device_delay)
 
 bacnet.disconnect()
