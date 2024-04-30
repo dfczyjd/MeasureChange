@@ -5,29 +5,20 @@ from BAC0.core.io.IOExceptions import UnknownPropertyError
 from os import scandir
 
 from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
-#from bacpypes.primitivedata import ObjectIdentifier
 
 # Config
-DEBUG = True
 
-if DEBUG:
-    probe_ip = '192.168.183.2'
-    ip_whitelist = [
-        '192.168.183.1',
-        '192.168.183.3'        
-    ]
-    BAC0.log_level('debug')
-else:
-    probe_ip = '131.155.223.49'
-    ip_whitelist = [
-        '131.155.70.40',
-        '131.155.70.41'
-    ]
+probe_ip = '192.168.183.2'
+ip_whitelist = [
+    '192.168.183.1',
+    '192.168.183.3'
+]
+property_delay = 0.0005
 device_delay = 0.005
-cycle_delay = 5
 output_filename = 'data.txt'
+log_level = 'debug'
 
-# TODO: find how devices name stuff and fix in mappings
+# TODO: find how BAC0 name stuff and fix in mappings
 object_names = dict([(x.lower(), x) for x in ObjectTypesSupported().bitNames.keys()])
 prop_names = dict([(x.lower(), x) for x in PropertyIdentifier().enumerations.keys()])
 
@@ -64,7 +55,8 @@ for file in scandir('../mappings'):
     with open(file, 'r') as fin:
         obj = yaml.safe_load(fin)
         mappings.update(update_names(obj))
-
+        
+BAC0.log_level(log_level)
 bacnet = BAC0.lite(ip=probe_ip)
 
 for ip in ip_whitelist:
@@ -94,6 +86,7 @@ with open(output_filename, 'a') as fout:
                     print(bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}'), file=fout)
                 except UnknownPropertyError:
                     print('property unavailable', file=fout)
+                time.sleep(property_delay)
         time.sleep(device_delay)
 
 bacnet.disconnect()
