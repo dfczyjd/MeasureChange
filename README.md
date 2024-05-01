@@ -11,7 +11,7 @@
     * property_delay: delay between requests to different object properties within the device
     * device_delay: delay between requests to different devices within the cycle, in seconds
     * output_filename: file to write collected data to
-    * log_level: logging level, one of 'debug', 'info', 'warning', 'error', default 'info'
+    * log_level: logging level, one of 'debug', 'info', 'warning', 'error'
   * probe_shell.py: a REPL shell to interactively query object properties
 * mwe: minimal working example of the probing script
   * See mwe/README.md for more information

@@ -16,7 +16,7 @@ ip_whitelist = [
 property_delay = 0.0005
 device_delay = 0.005
 output_filename = 'data.txt'
-log_level = 'debug'
+log_level = 'info'
 
 # TODO: find how BAC0 name stuff and fix in mappings
 object_names = dict([(x.lower(), x) for x in ObjectTypesSupported().bitNames.keys()])
@@ -62,31 +62,27 @@ bacnet = BAC0.lite(ip=probe_ip)
 for ip in ip_whitelist:
     bacnet.discover(limits=(ip, ''), global_broadcast=False)
 devices = dict()
-print('Found', bacnet.discoveredDevices)
 for dev in bacnet.discoveredDevices:
-    objects = bacnet.read(f'{dev[0]} device {dev[1]} objectList')
-    print('Objects on device:', objects)
-    devices[dev] = objects
-print('Devices:', devices)
-if len(devices) == 0:
-    print('Fail')
+    devices[dev] = bacnet.read(f'{dev[0]} device {dev[1]} objectList')
 with open(output_filename, 'a') as fout:
     print(time.strftime('%Y/%M/%d %H:%M:%S', time.localtime()), file=fout)
-    for device, objects in devices.items():
-        print(device, end=': \n')
-        for obj in objects:
-            if obj[0] not in mappings:
-                print('Skipping object type', obj[0], '(mapping not implemented)', file=fout)
-                continue
-            print(obj[0], obj[1], sep=':', end=':\n', file=fout)
-            mapping = mappings[obj[0]]
-            for key in mapping:
-                print('  ' + key, end=': ', file=fout)
-                try:
-                    print(bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}'), file=fout)
-                except UnknownPropertyError:
-                    print('property unavailable', file=fout)
-                time.sleep(property_delay)
-        time.sleep(device_delay)
+    if len(devices) == 0:
+        print('Failed to discover devices', file=fout)
+    else:
+        for device, objects in devices.items():
+            for obj in objects:
+                if obj[0] not in mappings:
+                    print('Skipping object type', obj[0], '(mapping not implemented)', file=fout)
+                    continue
+                print(device[0], obj[0], obj[1], sep=':', end=':\n', file=fout)
+                mapping = mappings[obj[0]]
+                for key in mapping:
+                    print('  ' + key, end=': ', file=fout)
+                    try:
+                        print(bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}'), file=fout)
+                    except UnknownPropertyError:
+                        print('property unavailable', file=fout)
+                    time.sleep(property_delay)
+            time.sleep(device_delay)
 
 bacnet.disconnect()

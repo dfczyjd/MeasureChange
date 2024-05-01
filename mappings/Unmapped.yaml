@@ -1,0 +1,199 @@
+Analog Input:
+  - Event State:
+    - TBA
+  - Object Identifier:
+    - TBA
+  - Out of Service:
+    - TBA
+  - Present Value:
+    - TBA
+  - Status Flags:
+    - TBA
+  - Units:
+    - TBA
+  - Acked Transitions:
+    - TBA
+  - COV Increment:
+    - TBA
+  - Deadband:
+    - TBA
+  - Device Type:
+    - TBA
+  - Event Enable:
+    - TBA
+  - Event Time Stamps:
+    - TBA
+  - High Limit:
+    - TBA
+  - Limit Enable:
+    - TBA
+  - Low Limit:
+    - TBA
+  - Max Pres Value:
+    - TBA
+  - Min Pres Value:
+    - TBA
+  - Notification Class:
+    - TBA
+  - Notify Type:
+    - TBA
+  - Profile Name:
+    - TBA
+  - Reliability:
+    - TBA
+  - Resolution:
+    - TBA
+  - Time Delay:
+    - TBA
+  - Update Interval:
+    - TBA
+Analog Output:
+  - Event State
+  - Object Identifier
+  - Out of Service
+  - Present Value
+  - Status Flags
+  - Units
+  - Acked Transitions
+  - COV Increment
+  - Deadband
+  - Device Type
+  - Event Enable
+  - Event Time Stamps
+  - High Limit
+  - Limit Enable
+  - Low Limit
+  - Max Pres Value
+  - Min Pres Value
+  - Notification Class
+  - Notify Type
+  - Priority Array
+  - Profile Name
+  - Reliability
+  - Relinquish Default
+  - Resolution
+  - Time Delay
+Analog Value:
+  - Event State:
+    - TBA
+  - Object Identifier:
+    - TBA
+  - Out of Service:
+    - TBA
+  - Present Value:
+    - TBA
+  - Status Flags:
+    - TBA
+  - Units:
+    - TBA
+  - Acked Transitions:
+    - TBA
+  - COV Increment:
+    - TBA
+  - Deadband:
+    - TBA
+  - Event Enable:
+    - TBA
+  - Event Time Stamps:
+    - TBA
+  - High Limit:
+    - TBA
+  - Limit Enable:
+    - TBA
+  - Low Limit:
+    - TBA
+  - Notification Class:
+    - TBA
+  - Notify Type:
+    - TBA
+  - Priority Array:
+    - TBA
+  - Profile Name:
+    - TBA
+  - Reliability:
+    - TBA
+  - Relinquish Default:
+    - TBA
+  - Time Delay:
+    - TBA
+Binary Output:
+  - Event State
+  - Object Identifier
+  - Out of Service
+  - Polarity
+  - Present Value
+  - Status Flags
+  - Acked Transitions
+  - Active Text
+  - Change of State Count
+  - Change of State Time
+  - Device Type
+  - Elapsed Active Time
+  - Event Enable
+  - Event Time Stamps
+  - Feedback Value
+  - Inactive Text
+  - Minimum Off Time
+  - Minimum On Time
+  - Notification Class
+  - Notify Type
+  - Priority Array
+  - Profile Name
+  - Reliability
+  - Relinquish Default
+  - Time Delay
+  - Time of Active Time Reset
+  - Time of State Count Reset
+Binary Value:
+  - Event State:
+    - TBA
+  - Object Identifier:
+    - TBA
+  - Out of Service:
+    - TBA
+  - Present Value:
+    - TBA
+  - Status Flags:
+    - TBA
+  - Acked Transitions:
+    - TBA
+  - Active Text:
+    - TBA
+  - Alarm Value:
+    - TBA
+  - Change of State Count:
+    - TBA
+  - Change of State Time:
+    - TBA
+  - Elapsed Active Time:
+    - TBA
+  - Event Enable:
+    - TBA
+  - Event Time Stamps:
+    - TBA
+  - Feedback Value:
+    - TBA
+  - Inactive Text:
+    - TBA
+  - Minimum Off Time:
+    - TBA
+  - Minimum On Time:
+    - TBA
+  - Notification Class:
+    - TBA
+  - Notify Type:
+    - TBA
+  - Priority Array:
+    - TBA
+  - Profile Name:
+    - TBA
+  - Reliability:
+    - TBA
+  - Relinquish Default:
+    - TBA
+  - Time Delay:
+    - TBA
+  - Time of Active Time Reset:
+    - TBA
+  - Time of State Count Reset:
+    - TBA
