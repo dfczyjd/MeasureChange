@@ -16,7 +16,7 @@ Event Enrollment:
         Actions:
         - value change
         Desc: toggles notifications as confirmed/unconfirmed
-  - Notification Class (*):
+  - Notification Class:
       Alarm Priority:
       Alarm Ack Required:
   - Priority:
@@ -24,8 +24,8 @@ Event Enrollment:
         Actions:
         - value change
         Desc: priority for events/alarms
-  - Recepient:
-      Monitoring Push Configuration:
-        Actions:
-        - activate/deactivate
-        Desc: recepient of the notification
+  #- Recipient:
+  #    Monitoring Push Configuration:
+  #      Actions:
+  #      - activate/deactivate
+  #      Desc: recipient of the notification

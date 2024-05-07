@@ -21,7 +21,7 @@ Multistate Value:
         Actions:
         - tighten/relax
         Desc: states that trigger an event/alarm upon staying for too long
-  - Notification Class (*):
+  - Notification Class:
       Alarm Priority:
       Alarm Ack Required:
   - Notify Type:

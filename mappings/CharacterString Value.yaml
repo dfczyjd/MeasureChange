@@ -26,7 +26,7 @@ CharacterString Value:
         Actions:
         - tighten/relax
         Desc: values for Present Value to raise an event/alarm
-  - Notification Class (*):
+  - Notification Class:
       Alarm Priority:
       Alarm Ack Required:
   - Notify Type:

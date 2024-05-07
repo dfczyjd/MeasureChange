@@ -10,7 +10,7 @@ Notification Class:
         Actions:
         - value change
         Desc: several values indicating priorities for events/alarms by their types
-  - Recepient List:
+  - Recipient List:
       Monitoring Push Configuration:
         Actions:
         - activate/deactivate
