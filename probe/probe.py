@@ -8,17 +8,8 @@ import sys
 
 from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
 
-# Config
-
-probe_ip = '192.168.183.2'
-ip_whitelist = [
-    '192.168.183.1',
-    '192.168.183.3'
-]
-property_delay = 0.0005
-device_delay = 0.005
-output_filename = 'data.txt'
-log_level = 'info'
+import config
+import patch
 
 # TODO: find how BAC0 name stuff and fix in mappings
 object_names = dict([(x.lower(), x) for x in ObjectTypesSupported().bitNames.keys()])
@@ -82,13 +73,17 @@ def process_device(device, out):
                     values[key] = bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}')
                 except UnknownPropertyError:
                     values[key] = None
-                time.sleep(property_delay)
+                except e as Exception:
+                    values[key] = e
+                time.sleep(config.property_delay)
         results[obj_name] = values
     out[dev_name] = results
 
 mappings = dict()
 for file in scandir('../mappings'):
     if not file.name.endswith('.yaml'):
+        continue
+    if file.name == 'Binary Value.yaml':
         continue
     with open(file, 'r') as fin:
         obj = yaml.safe_load(fin)
@@ -97,24 +92,32 @@ for file in scandir('../mappings'):
 if verify_mapping(mappings):
     sys.exit()
 
-BAC0.log_level(stdout=log_level)
-bacnet = BAC0.lite(ip=probe_ip)
+BAC0.log_level(stdout=config.log_level)
+bacnet = BAC0.lite(ip=config.probe_ip)
 
-for ip in ip_whitelist:
+for ip in config.ip_whitelist:
     bacnet.discover(limits=(ip, ''), global_broadcast=False)
+    time.sleep(config.discovery_delay)
 
 data = dict()
 
-for dev in bacnet.discoveredDevices:
-    process_device(dev, data)
-    time.sleep(device_delay)
-with open(output_filename, 'a') as fout:
+errors = [None] * len(bacnet.discoveredDevices)
+
+for i, dev in enumerate(bacnet.discoveredDevices):
+    try:
+        process_device(dev, data)
+        time.sleep(config.device_delay)
+    except Exception as e:
+        errors[i] = e
+with open(config.output_filename, 'a') as fout:
     print(time.strftime('%Y/%m/%d %H:%M:%S', time.localtime()), file=fout)
     if len(data) == 0:
         print('Failed to discover devices', file=fout)
     else:
-        for dev in data:
+        for i, dev in enumerate(data):
             print(dev, file=fout)
+            if errors[i] is not None:
+                print(f'  Exception in device: {e}', file=fout)
             dev_data = data[dev]
             for obj_name in dev_data:
                 print('  ' + obj_name, file=fout)
