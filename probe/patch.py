@@ -61,22 +61,16 @@ ReadProperty.build_rpm_request = build_rpm_request_patch
 
 
 # If errors occur while printing complex objects, remove everything below
-def priority_array_str(self):
-    data = []
-    for elem in self.value[1:]:
-        data.append(str(elem.dict_contents()))
-    return str(data)
+from io import StringIO
 
-def cov_subscription_str(self):
-    return f'{{Recipient: {self.recipient}, MonitoredPropertyReference: {self.monitoredPropertyReference}, IssueConfirmedNotifications: {self.issueConfirmedNotifications}, TimeRemaining: {self.timeRemaining}}}'
+def dump(self):
+    out = StringIO()
+    obj.debug_contents(file=out)
+    print(out.getvalue())
+    return out.getvalue()
 
-def date_time_str(self):
-    return f'{self.date} {self.time}'
-
-def timestamp_str(self):
-    return f'{self.time}'
-
-PriorityArray.__str__ = priority_array_str
-COVSubscription.__str__ = cov_subscription_str
-DateTime.__str__ = date_time_str
-TimeStamp.__str__ = timestamp_str
+PriorityArray.__str__ = dump
+COVSubscription.__str__ = dump
+DateTime.__str__ = dump
+TimeStamp.__str__ = dump
+DailySchedule.__str__ = dump
