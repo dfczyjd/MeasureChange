@@ -53,7 +53,8 @@ def verify_mapping(mapping):
                 flag = True
     return flag
 
-def process_device(device, out):
+def process_device(device):
+    global data
     dev_name = dev[0] + ':' + str(dev[1])
     objects = bacnet.read(f'{device[0]} device {device[1]} objectList')
     results = dict()
@@ -77,7 +78,7 @@ def process_device(device, out):
                     values[key] = e
                 time.sleep(config.property_delay)
         results[obj_name] = values
-    out[dev_name] = results
+    data[dev_name] = results
 
 mappings = dict()
 for file in scandir('../mappings'):
@@ -105,7 +106,7 @@ errors = [None] * len(bacnet.discoveredDevices)
 
 for i, dev in enumerate(bacnet.discoveredDevices):
     try:
-        process_device(dev, data)
+        process_device(dev)
         time.sleep(config.device_delay)
     except Exception as e:
         errors[i] = e
