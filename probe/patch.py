@@ -65,8 +65,7 @@ from io import StringIO
 
 def dump(self):
     out = StringIO()
-    obj.debug_contents(file=out)
-    print(out.getvalue())
+    self.debug_contents(file=out)
     return out.getvalue()
 
 PriorityArray.__str__ = dump

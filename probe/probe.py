@@ -96,15 +96,20 @@ if verify_mapping(mappings):
 BAC0.log_level(stdout=config.log_level)
 bacnet = BAC0.lite(ip=config.probe_ip)
 
+discovered = []
+
 for ip in config.ip_whitelist:
-    bacnet.discover(limits=(ip, ''), global_broadcast=False)
+    if type(ip) is tuple:
+        discovered.append(ip)
+        continue
+    discovered += bacnet.discover(limits=(ip, ''), global_broadcast=False)
     time.sleep(config.discovery_delay)
 
 data = dict()
 
-errors = [None] * len(bacnet.discoveredDevices)
+errors = [None] * len(discovered)
 
-for i, dev in enumerate(bacnet.discoveredDevices):
+for i, dev in enumerate(discovered):
     try:
         process_device(dev)
         time.sleep(config.device_delay)

@@ -1,5 +1,10 @@
 Binary Input:
   # Required
+  - Out of Service:
+      Device Diagnostics:
+        Actions:
+        - config change
+        Desc: on/off state of hardware
   - Polarity:
       Device Diagnostics:
         Actions:
