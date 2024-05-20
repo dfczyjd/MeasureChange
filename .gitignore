@@ -1,2 +1,5 @@
 probe/data.txt
+probe/__pycache__
+probe/base.sqlite3
+probe/drop_db.bat
 mwe/run.sh

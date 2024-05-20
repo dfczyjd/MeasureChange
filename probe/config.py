@@ -28,3 +28,5 @@ discovery_delay = 0.1  # seconds between discovery probes to different devices
 # Output filenames
 output_filename = pathlib.Path.home() / "vasily_results" / f"data{time.strftime('%Y%m%dT%H%M', time.localtime())}_localtime.txt"
 output_filename = output_filename.as_posix()
+
+db_file = 'database.sqlite3'

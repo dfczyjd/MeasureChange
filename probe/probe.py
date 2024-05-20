@@ -1,10 +1,12 @@
 import yaml
 import time
+import datetime
 import BAC0
 from BAC0.core.io.IOExceptions import UnknownPropertyError
 from os import scandir
 from threading import Thread
 import sys
+import sqlite3
 
 from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
 
@@ -55,7 +57,7 @@ def verify_mapping(mapping):
 
 def process_device(device):
     global data
-    dev_name = dev[0] + ':' + str(dev[1])
+    dev_name = dev[0]
     objects = bacnet.read(f'{device[0]} device {device[1]} objectList')
     results = dict()
     for obj in objects:
@@ -99,40 +101,79 @@ bacnet = BAC0.lite(ip=config.probe_ip)
 discovered = []
 
 for ip in config.ip_whitelist:
-    if type(ip) is tuple:
-        discovered.append(ip)
-        continue
-    discovered += bacnet.discover(limits=(ip, ''), global_broadcast=False)
+    try:
+        discovered.append((ip, bacnet.read(f'{ip} device {0x3fffff} objectIdentifier')[1]))
+    except:
+        pass
     time.sleep(config.discovery_delay)
 
 data = dict()
 
 errors = [None] * len(discovered)
 
+timestamp = datetime.datetime.now()
 for i, dev in enumerate(discovered):
     try:
         process_device(dev)
         time.sleep(config.device_delay)
     except Exception as e:
         errors[i] = e
-with open(config.output_filename, 'a') as fout:
-    print(time.strftime('%Y/%m/%d %H:%M:%S', time.localtime()), file=fout)
-    if len(data) == 0:
-        print('Failed to discover devices', file=fout)
-    else:
-        for i, dev in enumerate(data):
-            print(dev, file=fout)
-            if errors[i] is not None:
-                print(f'  Exception in device: {e}', file=fout)
-            dev_data = data[dev]
-            for obj_name in dev_data:
-                print('  ' + obj_name, file=fout)
-                obj_data = dev_data[obj_name]
-                for prop_name in obj_data:
-                    print('    ' + prop_name, end=': ', file=fout)
-                    if obj_data[prop_name] is None:
-                        print('property unavailable', file=fout)
-                    else:
-                        print(obj_data[prop_name], file=fout)
+
+try:
+    db = sqlite3.connect(config.db_file)
+    cur = db.cursor()
+    for i, dev in enumerate(data):
+        cur.execute('SELECT Id FROM Devices WHERE Address = ?', (dev,))
+        row = cur.fetchone()
+        if row is None:
+            cur.execute('INSERT INTO Devices(Address) VALUES (?)', (dev,))
+            dev_id = cur.lastrowid
+        else:
+            dev_id = row[0]
+        if errors[i] is not None:
+            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, errors[i]))
+        dev_data = data[dev]
+        for obj_name in dev_data:
+            cur.execute('SELECT Id FROM Objects WHERE Device = ?', (dev_id,))
+            row = cur.fetchone()
+            if row is None:
+                obj_type, bacnet_obj_id = obj_name.split(':')
+                cur.execute('INSERT INTO Objects(Device, Type, BACnetId) VALUES (?, ?, ?)', (dev_id, obj_type, bacnet_obj_id))
+                obj_id = cur.lastrowid
+            else:
+                obj_id = row[0]
+            obj_data = dev_data[obj_name]
+            for prop_name in obj_data:
+                value = obj_data[prop_name]
+                if value is not None:
+                    value = str(value)
+                cur.execute('INSERT INTO Properties(Timestamp, Object, Name, Value) VALUES (?, ?, ?, ?)', (timestamp, obj_id, prop_name, value))
+    db.commit()
+    db.close()
+except sqlite3.Error as e:
+    print('Exception while writing to the database:')
+    print(e)
+    sys.exit(0)
+    with open(config.output_filename, 'a') as fout:
+        print('Exception while writing to the database:', file=fout)
+        print(e, file=fout)
+        print(time.strftime('%Y/%m/%d %H:%M:%S', timestamp), file=fout)
+        if len(data) == 0:
+            print('Failed to discover devices', file=fout)
+        else:
+            for i, dev in enumerate(data):
+                print(dev, file=fout)
+                if errors[i] is not None:
+                    print(f'  Exception in device: {e}', file=fout)
+                dev_data = data[dev]
+                for obj_name in dev_data:
+                    print('  ' + obj_name, file=fout)
+                    obj_data = dev_data[obj_name]
+                    for prop_name in obj_data:
+                        print('    ' + prop_name, end=': ', file=fout)
+                        if obj_data[prop_name] is None:
+                            print('property unavailable', file=fout)
+                        else:
+                            print(obj_data[prop_name], file=fout)
 
 bacnet.disconnect()
