@@ -10,7 +10,9 @@
     * ip_whitelist: list of IPs to probe
     * property_delay: delay between requests to different object properties within the device
     * device_delay: delay between requests to different devices within the cycle, in seconds
-    * output_filename: file to write collected data to
+    * discovery_delay: delay between device discovery requests, in seconds
+    * db_file: file containing database to write collected data to
+    * output_filename: file to write collected data to, if database is inaccessible
     * log_level: logging level, one of 'debug', 'info', 'warning', 'error'
   * probe_shell.py: a REPL shell to interactively query object properties
 * mwe: minimal working example of the probing script
