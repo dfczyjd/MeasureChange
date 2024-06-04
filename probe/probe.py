@@ -55,26 +55,29 @@ def verify_mapping(mapping):
 
 def process_device(device):
     global data
+    print(f"Prossess device {device}")
     dev_name = dev[0] + ':' + str(dev[1])
     objects = bacnet.read(f'{device[0]} device {device[1]} objectList')
+    print(f"Process {len(objects)} objects on device {device} (trying ReadPropertyMultiple)")
     results = dict()
     for obj in objects:
         obj_name = obj[0] + ':' + str(obj[1])
         if obj[0] not in mappings:
-            results[obj_name] = ' '.join('Skipping object type', obj[0], '(mapping not implemented)')
+            results[obj_name] = f'Skipping object type {obj[0]} (mapping not implemented)'
             continue
         mapping = mappings[obj[0]]
         try:
             vals = bacnet.readMultiple(f'{device[0]} {obj[0]} {obj[1]} {" ".join(mapping.keys())}')
             values = dict(zip(mapping.keys(), vals))
         except: # TODO: find exception for "readMultiple not supported"
+            print(f"ReadPropertyMultiple not supported, fallback to ReadProperty for {dev_name}")
             values = dict()
             for key in mapping:
                 try:
                     values[key] = bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}')
                 except UnknownPropertyError:
                     values[key] = None
-                except e as Exception:
+                except Exception as e:
                     values[key] = e
                 time.sleep(config.property_delay)
         results[obj_name] = values
@@ -107,15 +110,19 @@ for ip in config.ip_whitelist:
 
 data = dict()
 
-errors = [None] * len(discovered)
+errors: list[None|Exception] = [None] * len(discovered)
 
-for i, dev in enumerate(discovered):
-    try:
-        process_device(dev)
-        time.sleep(config.device_delay)
-    except Exception as e:
-        errors[i] = e
+
 with open(config.output_filename, 'a') as fout:
+    # Discovery
+    for i, dev in enumerate(discovered):
+        try:
+            process_device(dev)
+            time.sleep(config.device_delay)
+        except Exception as e:
+            errors[i] = e
+    
+    # Scanning
     print(time.strftime('%Y/%m/%d %H:%M:%S', time.localtime()), file=fout)
     if len(data) == 0:
         print('Failed to discover devices', file=fout)
@@ -123,16 +130,23 @@ with open(config.output_filename, 'a') as fout:
         for i, dev in enumerate(data):
             print(dev, file=fout)
             if errors[i] is not None:
-                print(f'  Exception in device: {e}', file=fout)
+                print(f'  Exception in device: {errors[i]}', file=fout)
             dev_data = data[dev]
             for obj_name in dev_data:
                 print('  ' + obj_name, file=fout)
                 obj_data = dev_data[obj_name]
+                if isinstance(obj_data, str):
+                    print(f'    do not inspect; {obj_data}', file=fout)
+                    continue
                 for prop_name in obj_data:
-                    print('    ' + prop_name, end=': ', file=fout)
-                    if obj_data[prop_name] is None:
-                        print('property unavailable', file=fout)
-                    else:
-                        print(obj_data[prop_name], file=fout)
+                    try:
+                        print('    ' + prop_name, end=': ', file=fout)
+                        if obj_data[prop_name] is None:
+                            print('property unavailable', file=fout)
+                        else:
+                            print(obj_data[prop_name], file=fout)
+                    except Exception as e:
+                        print('unhandled error:', e, file=fout)
+    print("\n\nEOF.", file=fout)
 
 bacnet.disconnect()
