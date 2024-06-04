@@ -57,26 +57,29 @@ def verify_mapping(mapping):
 
 def process_device(device):
     global data
+    print(f"Prossess device {device}")
     dev_name = dev[0]
     objects = bacnet.read(f'{device[0]} device {device[1]} objectList')
+    print(f"Process {len(objects)} objects on device {device} (trying ReadPropertyMultiple)")
     results = dict()
     for obj in objects:
         obj_name = obj[0] + ':' + str(obj[1])
         if obj[0] not in mappings:
-            results[obj_name] = ' '.join('Skipping object type', obj[0], '(mapping not implemented)')
+            results[obj_name] = f'Skipping object type {obj[0]} (mapping not implemented)'
             continue
         mapping = mappings[obj[0]]
         try:
             vals = bacnet.readMultiple(f'{device[0]} {obj[0]} {obj[1]} {" ".join(mapping.keys())}')
             values = dict(zip(mapping.keys(), vals))
         except: # TODO: find exception for "readMultiple not supported"
+            print(f"ReadPropertyMultiple not supported, fallback to ReadProperty for {dev_name}")
             values = dict()
             for key in mapping:
                 try:
                     values[key] = bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}')
                 except UnknownPropertyError:
                     values[key] = None
-                except e as Exception:
+                except Exception as e:
                     values[key] = e
                 time.sleep(config.property_delay)
         results[obj_name] = values
@@ -106,11 +109,14 @@ for ip in config.ip_whitelist:
     except:
         pass
     time.sleep(config.discovery_delay)
+print(f"Read {len(discovered)} devices through discovery phase")
 
 data = dict()
 
-errors = [None] * len(discovered)
+errors: list[None|Exception] = [None] * len(discovered)
 
+
+<<<<<<< HEAD
 timestamp = datetime.datetime.now()
 for i, dev in enumerate(discovered):
     try:
@@ -127,11 +133,13 @@ try:
         row = cur.fetchone()
         if row is None:
             cur.execute('INSERT INTO Devices(Address) VALUES (?)', (dev,))
+            db.commit()
             dev_id = cur.lastrowid
         else:
             dev_id = row[0]
         if errors[i] is not None:
             cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, errors[i]))
+            db.commit()
         dev_data = data[dev]
         for obj_name in dev_data:
             cur.execute('SELECT Id FROM Objects WHERE Device = ?', (dev_id,))
@@ -139,6 +147,7 @@ try:
             if row is None:
                 obj_type, bacnet_obj_id = obj_name.split(':')
                 cur.execute('INSERT INTO Objects(Device, Type, BACnetId) VALUES (?, ?, ?)', (dev_id, obj_type, bacnet_obj_id))
+                db.commit()
                 obj_id = cur.lastrowid
             else:
                 obj_id = row[0]
@@ -148,7 +157,7 @@ try:
                 if value is not None:
                     value = str(value)
                 cur.execute('INSERT INTO Properties(Timestamp, Object, Name, Value) VALUES (?, ?, ?, ?)', (timestamp, obj_id, prop_name, value))
-    db.commit()
+                db.commit()
     db.close()
 except sqlite3.Error as e:
     print('Exception while writing to the database:')
@@ -163,6 +172,9 @@ except sqlite3.Error as e:
         else:
             for i, dev in enumerate(data):
                 print(dev, file=fout)
+                if isinstance(obj_data, str):
+                    print(f'    do not inspect; {obj_data}', file=fout)
+                    continue
                 if errors[i] is not None:
                     print(f'  Exception in device: {e}', file=fout)
                 dev_data = data[dev]
@@ -175,5 +187,8 @@ except sqlite3.Error as e:
                             print('property unavailable', file=fout)
                         else:
                             print(obj_data[prop_name], file=fout)
+                    except Exception as e:
+                        print('unhandled error:', e, file=fout)
+    print("\n\nEOF.", file=fout)
 
 bacnet.disconnect()
