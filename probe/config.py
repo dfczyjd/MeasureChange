@@ -25,8 +25,12 @@ property_delay = 0.2  # seconds between two properties on the same device
 device_delay = 0.2  # seconds between probes to two different devices
 discovery_delay = 0.1  # seconds between discovery probes to different devices
 
-# Output filenames
+# Maximum number of properties to query in a single readMultiple request
+property_batch_size = 15
+
+### Output filenames
+# Database to store results and exceptions
+db_file = 'database.sqlite3'
+# Text output file for cases, when writing to database failed
 output_filename = pathlib.Path.home() / "vasily_results" / f"data{time.strftime('%Y%m%dT%H%M', time.localtime())}_localtime.txt"
 output_filename = output_filename.as_posix()
-
-db_file = 'database.sqlite3'

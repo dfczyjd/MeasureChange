@@ -69,10 +69,14 @@ def process_device(device):
             continue
         mapping = mappings[obj[0]]
         try:
-            vals = bacnet.readMultiple(f'{device[0]} {obj[0]} {obj[1]} {" ".join(mapping.keys())}')
+            vals = []
+            for i in range(0, len(mapping), config.property_batch_size):
+                props = list(mapping.keys())[i:i + config.property_batch_size]
+                vals += bacnet.readMultiple(f'{device[0]} {obj[0]} {obj[1]} {" ".join(props)}')
             values = dict(zip(mapping.keys(), vals))
-        except: # TODO: find exception for "readMultiple not supported"
-            print(f"ReadPropertyMultiple not supported, fallback to ReadProperty for {dev_name}")
+        except Exception as e: # TODO: find exception for "readMultiple not supported"
+            print(f'ReadPropertyMultiple not supported, fallback to ReadProperty for {dev_name}')
+            print(f'Reason: {e}')
             values = dict()
             for key in mapping:
                 try:
@@ -106,17 +110,15 @@ discovered = []
 for ip in config.ip_whitelist:
     try:
         discovered.append((ip, bacnet.read(f'{ip} device {0x3fffff} objectIdentifier')[1]))
-    except:
-        pass
+    except Exception as e:
+        print(e, flush=True)
     time.sleep(config.discovery_delay)
 print(f"Read {len(discovered)} devices through discovery phase")
 
 data = dict()
 
-errors: list[None|Exception] = [None] * len(discovered)
+errors = [None] * len(discovered)
 
-
-<<<<<<< HEAD
 timestamp = datetime.datetime.now()
 for i, dev in enumerate(discovered):
     try:
@@ -142,10 +144,10 @@ try:
             db.commit()
         dev_data = data[dev]
         for obj_name in dev_data:
-            cur.execute('SELECT Id FROM Objects WHERE Device = ?', (dev_id,))
+            obj_type, bacnet_obj_id = obj_name.split(':')
+            cur.execute('SELECT Id FROM Objects WHERE Device = ? AND Type = ? AND BACnetId = ?', (dev_id, obj_type, bacnet_obj_id))
             row = cur.fetchone()
             if row is None:
-                obj_type, bacnet_obj_id = obj_name.split(':')
                 cur.execute('INSERT INTO Objects(Device, Type, BACnetId) VALUES (?, ?, ?)', (dev_id, obj_type, bacnet_obj_id))
                 db.commit()
                 obj_id = cur.lastrowid
@@ -160,13 +162,10 @@ try:
                 db.commit()
     db.close()
 except sqlite3.Error as e:
-    print('Exception while writing to the database:')
-    print(e)
-    sys.exit(0)
     with open(config.output_filename, 'a') as fout:
         print('Exception while writing to the database:', file=fout)
         print(e, file=fout)
-        print(time.strftime('%Y/%m/%d %H:%M:%S', timestamp), file=fout)
+        print(time.strftime('%Y/%m/%d %H:%M:%S', time.localtime()), file=fout)
         if len(data) == 0:
             print('Failed to discover devices', file=fout)
         else:
@@ -181,12 +180,16 @@ except sqlite3.Error as e:
                 for obj_name in dev_data:
                     print('  ' + obj_name, file=fout)
                     obj_data = dev_data[obj_name]
-                    for prop_name in obj_data:
-                        print('    ' + prop_name, end=': ', file=fout)
-                        if obj_data[prop_name] is None:
-                            print('property unavailable', file=fout)
-                        else:
-                            print(obj_data[prop_name], file=fout)
+                    try:
+                        if type(obj_data) == str:
+                            print('    ' + obj_data, file=fout)
+                            continue
+                        for prop_name in obj_data:
+                            print('    ' + prop_name, end=': ', file=fout)
+                            if obj_data[prop_name] is None:
+                                print('property unavailable', file=fout)
+                            else:
+                                print(obj_data[prop_name], file=fout)
                     except Exception as e:
                         print('unhandled error:', e, file=fout)
     print("\n\nEOF.", file=fout)

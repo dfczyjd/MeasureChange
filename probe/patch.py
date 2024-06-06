@@ -2,6 +2,7 @@ from bacpypes.basetypes import *
 from bacpypes.apdu import ReadAccessSpecification
 from BAC0.core.io.Read import *
 from BAC0.scripts import Lite
+import bacpypes.basetypes
 
 def build_rpm_request_patch(self, args, vendor_id = 0):
     self._log.debug(args)
@@ -62,14 +63,19 @@ ReadProperty.build_rpm_request = build_rpm_request_patch
 
 # If errors occur while printing complex objects, remove everything below
 from io import StringIO
+import inspect
 
 def dump(self):
     out = StringIO()
     self.debug_contents(file=out)
     return out.getvalue()
 
-PriorityArray.__str__ = dump
-COVSubscription.__str__ = dump
-DateTime.__str__ = dump
-TimeStamp.__str__ = dump
-DailySchedule.__str__ = dump
+def str_wrap(self):
+    return str(self)
+
+for _, typ in inspect.getmembers(bacpypes.basetypes, inspect.isclass):
+    if typ.__repr__ is object.__repr__:
+        if hasattr(typ, 'debug_contents'):
+            typ.__repr__ = dump
+        elif typ.__str__ is object.__str__:
+            typ.__repr__ = str_wrap
