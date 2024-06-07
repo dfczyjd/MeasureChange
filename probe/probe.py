@@ -155,10 +155,18 @@ try:
                 obj_id = row[0]
             obj_data = dev_data[obj_name]
             for prop_name in obj_data:
+                cur.execute('SELECT Id FROM Properties WHERE Object = ? AND Name = ?', (obj_id, prop_name))
+                row = cur.fetchone()
+                if row is None:
+                    cur.execute('INSERT INTO Properties(Object, Name) VALUES (?, ?)', (obj_id, prop_name))
+                    db.commit()
+                    prop_id = cur.lastrowid
+                else:
+                    prop_id = row[0]
                 value = obj_data[prop_name]
                 if value is not None:
                     value = str(value)
-                cur.execute('INSERT INTO Properties(Timestamp, Object, Name, Value) VALUES (?, ?, ?, ?)', (timestamp, obj_id, prop_name, value))
+                cur.execute('INSERT INTO PropertyValues(Timestamp, Property, Value) VALUES (?, ?, ?)', (timestamp, prop_id, value))
                 db.commit()
     db.close()
 except sqlite3.Error as e:
@@ -192,6 +200,6 @@ except sqlite3.Error as e:
                                 print(obj_data[prop_name], file=fout)
                     except Exception as e:
                         print('unhandled error:', e, file=fout)
-    print("\n\nEOF.", file=fout)
+        print("\n\nEOF.", file=fout)
 
 bacnet.disconnect()
