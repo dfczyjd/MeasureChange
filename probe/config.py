@@ -27,6 +27,10 @@ discovery_delay = 0.1  # seconds between discovery probes to different devices
 
 # Maximum number of properties to query in a single readMultiple request
 property_batch_size = 15
+# Maximum number of bytes to read in a single ReadFile request to stream access file
+stream_batch_size = 1024
+# Maximum number of records to read in a single ReadFile request to record access file
+record_batch_size = 10
 
 ### Output filenames
 # Database to store results and exceptions

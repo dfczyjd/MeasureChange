@@ -16,6 +16,9 @@
     * db_file: file containing database to write collected data to
     * output_filename: file to write collected data to, if database is inaccessible
     * log_level: logging level, one of 'debug', 'info', 'warning', 'error'
+    * property_batch_size: maximum number of properties to query in a single readMultiple request
+    * stream_batch_size: maximum number of bytes to read in a single ReadFile request to a File object with StreamAccess file access method
+    * record_batch_size: maximum number of records to read in a single ReadFile request to a File object with RecordAccess file access method
   * database.sqlite3: empty database containing all necessary tables
   * file_reader.py: script to read files from devices (requires config.py and data from database specified in it)
 * mwe: minimal working example of the probing script

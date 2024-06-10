@@ -19,12 +19,12 @@ class ReadFile(Lite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-    def read_file(self, address, fileId, size, access_method):
+    def read_file(self, address, fileId, start, size, access_method):
         is_record = (access_method == 'recordAccess')
         try:
             # build AtomicReadFile request
             iocb = IOCB(
-                self.build_request(address, fileId, size, is_record)
+                self.build_request(address, fileId, start, size, is_record)
             )
             iocb.set_timeout(5)
             # pass to the BACnet stack
@@ -55,15 +55,15 @@ class ReadFile(Lite):
             print('Error reading file:', reason)
         return None
     
-    def build_request(self, address, fileId, size, is_record):
+    def build_request(self, address, fileId, start, size, is_record):
         if is_record:
             method = AtomicReadFileRequestAccessMethodChoice(recordAccess=AtomicReadFileRequestAccessMethodChoiceRecordAccess(
-                fileStartRecord=0,
+                fileStartRecord=start,
                 requestedRecordCount=size
             ))
         else:
             method = AtomicReadFileRequestAccessMethodChoice(streamAccess=AtomicReadFileRequestAccessMethodChoiceStreamAccess(
-                fileStartPosition=0,
+                fileStartPosition=start,
                 requestedOctetCount=size
             ))
         request = AtomicReadFileRequest(
@@ -95,14 +95,22 @@ os.makedirs('files', exist_ok=True)
 
 bacnet = ReadFile(ip=config.probe_ip)
 for address, file_id, access_method in files:
+    print(f'Processing file {file_id} at {address} using {access_method} method', flush=True)
     try:
         if access_method == 'recordAccess':
+            batch_size = config.record_batch_size
             size = bacnet.read(f'{address} file {file_id} recordCount')
+            batch_range = range(0, size, config.record_batch_size)
         else:
+            batch_size = config.stream_batch_size
             size = bacnet.read(f'{address} file {file_id} fileSize')
-        data = bacnet.read_file_stream(address, ('file', file_id), size, access_method)
+            batch_range = range(0, size, config.stream_batch_size)
+        data = []
+        for batch_start in batch_range:
+            print(f'Reading {batch_size} units starting from {batch_start} (of {size})', flush=True)
+            data.append(bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method))
         with open(f'files/{address}_{file_id}.xml', 'wb') as fout:
-            fout.write(data)
+            fout.write(b''.join(data))
     except Exception as e:
         print('Error while reading file', file_id, 'from', address)
         print(' ', e, flush=True)
