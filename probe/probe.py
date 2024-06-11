@@ -144,6 +144,10 @@ try:
             db.commit()
         dev_data = data[dev]
         for obj_name in dev_data:
+            obj_data = dev_data[obj_name]
+            if type(obj_data) == str:
+                print(obj_data)
+                continue
             obj_type, bacnet_obj_id = obj_name.split(':')
             cur.execute('SELECT Id FROM Objects WHERE Device = ? AND Type = ? AND BACnetId = ?', (dev_id, obj_type, bacnet_obj_id))
             row = cur.fetchone()
@@ -153,7 +157,6 @@ try:
                 obj_id = cur.lastrowid
             else:
                 obj_id = row[0]
-            obj_data = dev_data[obj_name]
             for prop_name in obj_data:
                 cur.execute('SELECT Id FROM Properties WHERE Object = ? AND Name = ?', (obj_id, prop_name))
                 row = cur.fetchone()
