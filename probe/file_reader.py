@@ -75,43 +75,37 @@ class ReadFile(Lite):
         return request
 
 
-
-db = sqlite3.connect(config.db_file)
-
-# Get all present files as tuples (Device ID, File object ID, File access method)
-files_query = """
-SELECT DISTINCT d.Address, o.BACnetId, pv.Value FROM Objects o
-	JOIN Devices d ON o.Device = d.Id
-	JOIN Properties p ON p.Object = o.Id AND p.Name = "fileAccessMethod"
-	JOIN PropertyValues pv ON pv.Property = p.Id
-	WHERE o.Type = "file"
-"""
-cur = db.cursor()
-cur.execute(files_query)
-files = cur.fetchall()
-db.close()
-
-os.makedirs('files', exist_ok=True)
-
-bacnet = ReadFile(ip=config.probe_ip)
-for address, file_id, access_method in files:
-    print(f'Processing file {file_id} at {address} using {access_method} method', flush=True)
-    try:
-        if access_method == 'recordAccess':
-            batch_size = config.record_batch_size
-            size = bacnet.read(f'{address} file {file_id} recordCount')
-            batch_range = range(0, size, config.record_batch_size)
-        else:
-            batch_size = config.stream_batch_size
-            size = bacnet.read(f'{address} file {file_id} fileSize')
-            batch_range = range(0, size, config.stream_batch_size)
-        data = []
-        for batch_start in batch_range:
-            print(f'Reading {batch_size} units starting from {batch_start} (of {size})', flush=True)
-            data.append(bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method))
-        with open(f'files/{address}_{file_id}.xml', 'wb') as fout:
-            fout.write(b''.join(data))
-    except Exception as e:
-        print('Error while reading file', file_id, 'from', address)
-        print(' ', e, flush=True)
-bacnet.disconnect()
+def fetch_files(db, timestamp):
+    # Get all present files as tuples (File object database ID, Device ID, File object BACnet ID, File access method)
+    files_query = """
+    SELECT DISTINCT o.Id, d.Address, o.BACnetId, pv.Value FROM Objects o
+        JOIN Devices d ON o.Device = d.Id
+        JOIN Properties p ON p.Object = o.Id AND p.Name = "fileAccessMethod"
+        JOIN PropertyValues pv ON pv.Property = p.Id
+        WHERE o.Type = "file"
+    """
+    cur = db.cursor()
+    cur.execute(files_query)
+    files = cur.fetchall()
+    
+    bacnet = ReadFile(ip=config.probe_ip)
+    for obj_id, address, file_id, access_method in files:
+        print(f'Processing file {file_id} at {address} using {access_method} method', flush=True)
+        try:
+            if access_method == 'recordAccess':
+                batch_size = config.record_batch_size
+                size = bacnet.read(f'{address} file {file_id} recordCount')
+                batch_range = range(0, size, config.record_batch_size)
+            else:
+                batch_size = config.stream_batch_size
+                size = bacnet.read(f'{address} file {file_id} fileSize')
+                batch_range = range(0, size, config.stream_batch_size)
+            data = []
+            for batch_start in batch_range:
+                print(f'Reading {batch_size} units starting from {batch_start} (of {size})', flush=True)
+                data.append(bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method))
+            cur.execute('INSERT INTO Files(Timestamp, File, Data) VALUES (?, ?, ?)', (timestamp, obj_id, b''.join(data)))
+        except Exception as e:
+            print('Error while reading file', file_id, 'from', address)
+            print(' ', e, flush=True)
+    bacnet.disconnect()

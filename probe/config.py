@@ -33,8 +33,12 @@ stream_batch_size = 1024
 record_batch_size = 10
 
 ### Output filenames
-# Database to store results and exceptions
-db_file = 'database.sqlite3'
+# Base directory for data files
+base_dir = 'data'
+# Database to store results and exceptions ({} will be replaced by creation date)
+db_file = '{}.sqlite3'
+# Template to initialize database
+db_base_file = 'base.sqlite3'
 # Text output file for cases, when writing to database failed
 output_filename = pathlib.Path.home() / "vasily_results" / f"data{time.strftime('%Y%m%dT%H%M', time.localtime())}_localtime.txt"
 output_filename = output_filename.as_posix()

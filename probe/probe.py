@@ -3,15 +3,18 @@ import time
 import datetime
 import BAC0
 from BAC0.core.io.IOExceptions import UnknownPropertyError
-from os import scandir
+import os
 from threading import Thread
 import sys
+import shutil
 import sqlite3
+import zlib
 
 from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
 
 import config
 import patch
+import file_reader
 
 # TODO: find how BAC0 name stuff and fix in mappings
 object_names = dict([(x.lower(), x) for x in ObjectTypesSupported().bitNames.keys()])
@@ -89,8 +92,33 @@ def process_device(device):
         results[obj_name] = values
     data[dev_name] = results
 
+def switch_db_file(new_db_file):
+    print('Switching to a new database file', flush=True)
+    try:
+        old_db_files = []
+        for elem in os.scandir(config.base_dir):
+            if elem.name.endswith('.sqlite3') and elem.name != config.db_base_file:
+                print('Found old database file:', elem.path, flush=True)
+                old_db_files.append(elem.path)
+        for file in old_db_files:
+            compress = zlib.compressobj()
+            with open(file, 'rb') as fin:
+                with open(file + '.zip', 'wb') as fout:
+                    while True:
+                        data = fin.read(65536)
+                        if len(data) == 0:
+                            break
+                        fout.write(compress.compress(data))
+                    fout.write(compress.flush())
+            print('Successfully compressed file to', file + '.zip', flush=True)
+            shutil.move(file, file + '_compressed')
+    except Exception as e:
+        print('Exception while compressing old databases:', e, flush=True)
+    shutil.copyfile(os.path.join(config.base_dir, config.db_base_file), new_db_file)
+    print('Created new database file', new_db_file, flush=True)
+
 mappings = dict()
-for file in scandir('../mappings'):
+for file in os.scandir('../mappings'):
     if not file.name.endswith('.yaml'):
         continue
     if file.name == 'Binary Value.yaml':
@@ -128,20 +156,21 @@ for i, dev in enumerate(discovered):
         errors[i] = e
 
 try:
-    db = sqlite3.connect(config.db_file)
+    db_file = os.path.join(config.base_dir, config.db_file.format(timestamp.strftime('%Y-%m-%d')))
+    if not os.path.exists(db_file):
+        switch_db_file(db_file)
+    db = sqlite3.connect(db_file, isolation_level=None)
     cur = db.cursor()
     for i, dev in enumerate(data):
         cur.execute('SELECT Id FROM Devices WHERE Address = ?', (dev,))
         row = cur.fetchone()
         if row is None:
             cur.execute('INSERT INTO Devices(Address) VALUES (?)', (dev,))
-            db.commit()
             dev_id = cur.lastrowid
         else:
             dev_id = row[0]
         if errors[i] is not None:
             cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, errors[i]))
-            db.commit()
         dev_data = data[dev]
         for obj_name in dev_data:
             obj_data = dev_data[obj_name]
@@ -153,7 +182,6 @@ try:
             row = cur.fetchone()
             if row is None:
                 cur.execute('INSERT INTO Objects(Device, Type, BACnetId) VALUES (?, ?, ?)', (dev_id, obj_type, bacnet_obj_id))
-                db.commit()
                 obj_id = cur.lastrowid
             else:
                 obj_id = row[0]
@@ -162,7 +190,6 @@ try:
                 row = cur.fetchone()
                 if row is None:
                     cur.execute('INSERT INTO Properties(Object, Name) VALUES (?, ?)', (obj_id, prop_name))
-                    db.commit()
                     prop_id = cur.lastrowid
                 else:
                     prop_id = row[0]
@@ -170,13 +197,15 @@ try:
                 if value is not None:
                     value = str(value)
                 cur.execute('INSERT INTO PropertyValues(Timestamp, Property, Value) VALUES (?, ?, ?)', (timestamp, prop_id, value))
-                db.commit()
+    bacnet.disconnect()  # We need a custom derived class in file_reader, so close here and reopen there
+    file_reader.fetch_files(db, timestamp)
+    
     db.close()
 except sqlite3.Error as e:
-    with open(config.output_filename, 'a') as fout:
+    with open(os.path.join(config.base_dir, config.output_filename), 'a') as fout:
         print('Exception while writing to the database:', file=fout)
         print(e, file=fout)
-        print(time.strftime('%Y/%m/%d %H:%M:%S', time.localtime()), file=fout)
+        print(timestamp.strftime('%Y/%m/%d %H:%M:%S'), file=fout)
         if len(data) == 0:
             print('Failed to discover devices', file=fout)
         else:
@@ -205,4 +234,8 @@ except sqlite3.Error as e:
                         print('unhandled error:', e, file=fout)
         print("\n\nEOF.", file=fout)
 
-bacnet.disconnect()
+# TODO: start with derived version from file_reader
+try:
+    bacnet.disconnect()
+except:
+    pass
