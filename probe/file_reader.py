@@ -95,10 +95,16 @@ def fetch_files(db, timestamp):
             if access_method == 'recordAccess':
                 batch_size = config.record_batch_size
                 size = bacnet.read(f'{address} file {file_id} recordCount')
+                if size >= config.large_record_file_size:
+                    print(f'File too big ({size} records), skipping', flush=True)
+                    continue
                 batch_range = range(0, size, config.record_batch_size)
             else:
                 batch_size = config.stream_batch_size
                 size = bacnet.read(f'{address} file {file_id} fileSize')
+                if size >= config.large_stream_file_size:
+                    print(f'File too big ({size} bytes), skipping', flush=True)
+                    continue
                 batch_range = range(0, size, config.stream_batch_size)
             data = []
             for batch_start in batch_range:
@@ -108,4 +114,5 @@ def fetch_files(db, timestamp):
         except Exception as e:
             print('Error while reading file', file_id, 'from', address)
             print(' ', e, flush=True)
+    db.commit()
     bacnet.disconnect()

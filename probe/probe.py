@@ -72,10 +72,7 @@ def process_device(device):
             continue
         mapping = mappings[obj[0]]
         try:
-            vals = []
-            for i in range(0, len(mapping), config.property_batch_size):
-                props = list(mapping.keys())[i:i + config.property_batch_size]
-                vals += bacnet.readMultiple(f'{device[0]} {obj[0]} {obj[1]} {" ".join(props)}')
+            vals = bacnet.readMultiple(f'{device[0]} {obj[0]} {obj[1]} {" ".join(mapping.keys())}')
             values = dict(zip(mapping.keys(), vals))
         except Exception as e: # TODO: find exception for "readMultiple not supported"
             print(f'ReadPropertyMultiple not supported, fallback to ReadProperty for {dev_name}')
@@ -159,7 +156,7 @@ try:
     db_file = os.path.join(config.base_dir, config.db_file.format(timestamp.strftime('%Y-%m-%d')))
     if not os.path.exists(db_file):
         switch_db_file(db_file)
-    db = sqlite3.connect(db_file, isolation_level=None)
+    db = sqlite3.connect(db_file, isolation_level='EXCLUSIVE')
     cur = db.cursor()
     for i, dev in enumerate(data):
         cur.execute('SELECT Id FROM Devices WHERE Address = ?', (dev,))
@@ -197,6 +194,7 @@ try:
                 if value is not None:
                     value = str(value)
                 cur.execute('INSERT INTO PropertyValues(Timestamp, Property, Value) VALUES (?, ?, ?)', (timestamp, prop_id, value))
+        db.commit()
     bacnet.disconnect()  # We need a custom derived class in file_reader, so close here and reopen there
     file_reader.fetch_files(db, timestamp)
     

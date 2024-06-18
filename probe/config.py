@@ -25,12 +25,14 @@ property_delay = 0.2  # seconds between two properties on the same device
 device_delay = 0.2  # seconds between probes to two different devices
 discovery_delay = 0.1  # seconds between discovery probes to different devices
 
-# Maximum number of properties to query in a single readMultiple request
-property_batch_size = 15
 # Maximum number of bytes to read in a single ReadFile request to stream access file
 stream_batch_size = 1024
 # Maximum number of records to read in a single ReadFile request to record access file
 record_batch_size = 10
+# Size threshold for stream access file in bytes to be considered large and skipped
+large_stream_file_size = 10485760
+# Size threshold for record access file in records to be considered large and skipped
+large_record_file_size = 10000
 
 ### Output filenames
 # Base directory for data files
