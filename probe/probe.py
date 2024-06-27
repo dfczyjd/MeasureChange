@@ -137,6 +137,7 @@ discovered = []
 
 timestamp = datetime.datetime.now()
 
+usedTxtFile = False
 try:
     # Initialize database file
     db_file = os.path.join(config.base_dir, config.db_file.format(timestamp.strftime('%Y-%m-%d')))
@@ -144,8 +145,15 @@ try:
         switch_db_file(db_file)
     db = sqlite3.connect(db_file, isolation_level='EXCLUSIVE')
     cur = db.cursor()
-    
-    for ip in config.ip_whitelist:
+except sqlite3.Error as e:
+    usedTxtFile = True
+    with open(os.path.join(config.base_dir, config.output_filename), 'a') as fout:
+        print(timestamp.strftime('%Y/%m/%d %H:%M:%S'), file=fout) 
+        print('Exception while writing to the database:', file=fout)
+        print(traceback.format_exc(), file=fout)
+
+for ip in config.ip_whitelist:
+    try:
         # Add device to database, if not already present
         cur.execute('SELECT Id FROM Devices WHERE Address = ?', (ip,))
         row = cur.fetchone()
@@ -197,48 +205,52 @@ try:
                 cur.execute('INSERT INTO PropertyValues(Timestamp, Property, Value) VALUES (?, ?, ?)', (timestamp, prop_id, value))
         db.commit()
         
-        # Wait before polling the next device to avoid network overload
-        time.sleep(config.device_delay)
-    
-    # Read files from the devices
-    # TODO: move this to the device cycle
-    bacnet.disconnect()  # We need a custom derived class in file_reader, so close here and reopen there
-    file_reader.fetch_files(db, timestamp)
-    db.close()
-except sqlite3.Error as e:
+    except sqlite3.Error as e:
+        with open(os.path.join(config.base_dir, config.output_filename), 'a') as fout:
+            if not usedTxtFile:
+                print(timestamp.strftime('%Y/%m/%d %H:%M:%S'), file=fout)
+            usedTxtFile = True
+            print('Exception while writing to the database:', file=fout)
+            print(traceback.format_exc(), file=fout)
+            print(f'{ip}:{dev_bacnet_id}', file=fout)
+            if isinstance(obj_data, str):
+                print(f'    do not inspect; {obj_data}', file=fout)
+                continue
+            for obj_name in dev_data:
+                print('  ' + obj_name, file=fout)
+                obj_data = dev_data[obj_name]
+                try:
+                    if type(obj_data) == str:
+                        print('    ' + obj_data, file=fout)
+                        continue
+                    for prop_name in obj_data:
+                        print('    ' + prop_name, end=': ', file=fout)
+                        if obj_data[prop_name] is None:
+                            print('property unavailable', file=fout)
+                        else:
+                            print(obj_data[prop_name], file=fout)
+                except Exception as e:
+                    print('unhandled error:', file=fout)
+                    print(traceback.format_exc(), file=fout)
+        
+    # Wait before polling the next device to avoid network overload
+    time.sleep(config.device_delay)
+
+if usedTxtFile:
     with open(os.path.join(config.base_dir, config.output_filename), 'a') as fout:
-        print('Exception while writing to the database:', file=fout)
-        print(e, file=fout)
-        print(timestamp.strftime('%Y/%m/%d %H:%M:%S'), file=fout)
-        if len(data) == 0:
-            print('Failed to discover devices', file=fout)
-        else:
-            for i, dev in enumerate(data):
-                print(dev, file=fout)
-                if isinstance(obj_data, str):
-                    print(f'    do not inspect; {obj_data}', file=fout)
-                    continue
-                if errors[i] is not None:
-                    print(f'  Exception in device: {e}', file=fout)
-                dev_data = data[dev]
-                for obj_name in dev_data:
-                    print('  ' + obj_name, file=fout)
-                    obj_data = dev_data[obj_name]
-                    try:
-                        if type(obj_data) == str:
-                            print('    ' + obj_data, file=fout)
-                            continue
-                        for prop_name in obj_data:
-                            print('    ' + prop_name, end=': ', file=fout)
-                            if obj_data[prop_name] is None:
-                                print('property unavailable', file=fout)
-                            else:
-                                print(obj_data[prop_name], file=fout)
-                    except Exception as e:
-                        print('unhandled error:', file=fout)
-                        print(traceback.format_exc(), file=fout)
-                        print('End of error', file=fout)
         print("\n\nEOF.", file=fout)
+
+# Read files from the devices
+# TODO: move this to the device cycle
+bacnet.disconnect()  # We need a custom derived class in file_reader, so close here and reopen there
+try:
+    file_reader.fetch_files(db, timestamp)
+except sqlite3.Error as e:
+    print('Error while accessing database for files:')
+    print(traceback.format_exc())
+    print('End of error', flush=True)
+db.close()
+
 
 # TODO: start with derived version from file_reader
 try:
