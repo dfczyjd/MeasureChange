@@ -14,6 +14,7 @@ import sqlite3
 import sys
 import os
 import config
+import traceback
 
 class ReadFile(Lite):
     def __init__(self, *args, **kwargs):
@@ -75,6 +76,24 @@ class ReadFile(Lite):
         return request
 
 
+def read_large_file(bacnet, address, file_id, out_file, batch_size):
+    try:
+        access_method = bacnet.read(f'{address} file {file_id} fileAccessMethod')
+        if access_method == 'recordAccess':
+            size = int(bacnet.read(f'{address} file {file_id} recordCount'))
+        else:
+            size = int(bacnet.read(f'{address} file {file_id} fileSize'))
+        batch_range = range(0, size, batch_size)
+        with open(out_file, 'wb') as fout:
+            for batch_start in batch_range:
+                print(f'Reading {batch_size} units starting from {batch_start} (of {size})', flush=True)
+                fout.write(bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method))
+    except Exception as e:
+        print('Error while reading file', file_id, 'from', address)
+        print(traceback.format_exc())
+        print('End of error', flush=True)
+
+
 def fetch_files(db, timestamp):
     # Get all present files as tuples (File object database ID, Device ID, File object BACnet ID, File access method)
     files_query = """
@@ -113,6 +132,7 @@ def fetch_files(db, timestamp):
             cur.execute('INSERT INTO Files(Timestamp, File, Data) VALUES (?, ?, ?)', (timestamp, obj_id, b''.join(data)))
         except Exception as e:
             print('Error while reading file', file_id, 'from', address)
-            print(' ', e, flush=True)
+            print(traceback.format_exc())
+            print('End of error', flush=True)
     db.commit()
     bacnet.disconnect()

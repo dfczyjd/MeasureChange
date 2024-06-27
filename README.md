@@ -5,7 +5,10 @@
   * aggregate.py: script to identify unmapped change types
 * probe: probing script with auxilliary files
   * probe.py: current version of the probing script
-  * probe_shell.py: a REPL shell to interactively query object properties
+  * probe_shell.py: a REPL shell to interactively query object properties and files. Target IP address is specified in variable `target`
+    Commands:
+    * `read object_type object_id properties` - read property or properties (separated by space) from a given object. Uses readProperty service if only one property is provided and readPropertyMultiple otherwise.
+    * `file file_id out_file [chunk_size]` - read file from the device and write the contents to `out_file`. Optional parameter `chunk_size` allows to configure size of a chunk requested in a single request (default 1 MB)
   * patch.py: patched versions of several BAC0 methods
   * config.py: configuration variables
     * probe_ip: IP of the probe within the BAS network
