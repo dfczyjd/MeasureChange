@@ -9,6 +9,7 @@ import sys
 import shutil
 import sqlite3
 import zlib
+import traceback
 
 from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
 
@@ -58,12 +59,10 @@ def verify_mapping(mapping):
                 flag = True
     return flag
 
-def process_device(device):
-    global data
-    print(f"Prossess device {device}")
-    dev_name = dev[0]
-    objects = bacnet.read(f'{device[0]} device {device[1]} objectList')
-    print(f"Process {len(objects)} objects on device {device} (trying ReadPropertyMultiple)")
+def process_device(addr, dev_id):
+    print(f"Prossess device {addr}:{dev_id}")
+    objects = bacnet.read(f'{addr} device {dev_id} objectList')
+    print(f"Process {len(objects)} objects on device {addr}:{dev_id} (trying ReadPropertyMultiple)")
     results = dict()
     for obj in objects:
         obj_name = obj[0] + ':' + str(obj[1])
@@ -72,22 +71,24 @@ def process_device(device):
             continue
         mapping = mappings[obj[0]]
         try:
-            vals = bacnet.readMultiple(f'{device[0]} {obj[0]} {obj[1]} {" ".join(mapping.keys())}')
+            vals = bacnet.readMultiple(f'{addr} {obj[0]} {obj[1]} {" ".join(mapping.keys())}')
             values = dict(zip(mapping.keys(), vals))
         except Exception as e: # TODO: find exception for "readMultiple not supported"
-            print(f'ReadPropertyMultiple not supported, fallback to ReadProperty for {dev_name}')
-            print(f'Reason: {e}')
+            print(f'ReadPropertyMultiple not supported, fallback to ReadProperty for {addr}:{dev_id}')
+            print('Reason:')
+            print(traceback.format_exc())
+            print('End of error', flush=True)
             values = dict()
             for key in mapping:
                 try:
-                    values[key] = bacnet.read(f'{device[0]} {obj[0]} {obj[1]} {key}')
+                    values[key] = bacnet.read(f'{addr} {obj[0]} {obj[1]} {key}')
                 except UnknownPropertyError:
                     values[key] = None
                 except Exception as e:
-                    values[key] = e
+                    values[key] = traceback.format_exc()
                 time.sleep(config.property_delay)
         results[obj_name] = values
-    data[dev_name] = results
+    return results
 
 def switch_db_file(new_db_file):
     print('Switching to a new database file', flush=True)
@@ -110,7 +111,9 @@ def switch_db_file(new_db_file):
             print('Successfully compressed file to', file + '.zip', flush=True)
             shutil.move(file, file + '_compressed')
     except Exception as e:
-        print('Exception while compressing old databases:', e, flush=True)
+        print('Exception while compressing old databases:')
+        print(traceback.format_exc())
+        print('End of error', flush=True)
     shutil.copyfile(os.path.join(config.base_dir, config.db_base_file), new_db_file)
     print('Created new database file', new_db_file, flush=True)
 
@@ -132,47 +135,45 @@ bacnet = BAC0.lite(ip=config.probe_ip)
 
 discovered = []
 
-for ip in config.ip_whitelist:
-    try:
-        discovered.append((ip, bacnet.read(f'{ip} device {0x3fffff} objectIdentifier')[1]))
-    except Exception as e:
-        print(e, flush=True)
-    time.sleep(config.discovery_delay)
-print(f"Read {len(discovered)} devices through discovery phase")
-
-data = dict()
-
-errors = [None] * len(discovered)
-
 timestamp = datetime.datetime.now()
-for i, dev in enumerate(discovered):
-    try:
-        process_device(dev)
-        time.sleep(config.device_delay)
-    except Exception as e:
-        errors[i] = e
 
 try:
+    # Initialize database file
     db_file = os.path.join(config.base_dir, config.db_file.format(timestamp.strftime('%Y-%m-%d')))
     if not os.path.exists(db_file):
         switch_db_file(db_file)
     db = sqlite3.connect(db_file, isolation_level='EXCLUSIVE')
     cur = db.cursor()
-    for i, dev in enumerate(data):
-        cur.execute('SELECT Id FROM Devices WHERE Address = ?', (dev,))
+    
+    for ip in config.ip_whitelist:
+        # Add device to database, if not already present
+        cur.execute('SELECT Id FROM Devices WHERE Address = ?', (ip,))
         row = cur.fetchone()
         if row is None:
-            cur.execute('INSERT INTO Devices(Address) VALUES (?)', (dev,))
+            cur.execute('INSERT INTO Devices(Address) VALUES (?)', (ip,))
             dev_id = cur.lastrowid
         else:
             dev_id = row[0]
-        if errors[i] is not None:
-            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, errors[i]))
-        dev_data = data[dev]
+    
+        # Discover the device
+        try:
+            dev_bacnet_id = bacnet.read(f'{ip} device {0x3fffff} objectIdentifier')[1]
+        except Exception as e:
+            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, traceback.format_exc()))
+            continue
+        
+        # Read the device properties
+        try:
+            dev_data = process_device(ip, dev_bacnet_id)
+        except Exception as e:
+            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, traceback.format_exc()))
+            continue
+        
+        # Write collected data to the database
         for obj_name in dev_data:
             obj_data = dev_data[obj_name]
             if type(obj_data) == str:
-                print(obj_data)
+                print(obj_data, flush=True)
                 continue
             obj_type, bacnet_obj_id = obj_name.split(':')
             cur.execute('SELECT Id FROM Objects WHERE Device = ? AND Type = ? AND BACnetId = ?', (dev_id, obj_type, bacnet_obj_id))
@@ -195,9 +196,14 @@ try:
                     value = str(value)
                 cur.execute('INSERT INTO PropertyValues(Timestamp, Property, Value) VALUES (?, ?, ?)', (timestamp, prop_id, value))
         db.commit()
+        
+        # Wait before polling the next device to avoid network overload
+        time.sleep(config.device_delay)
+    
+    # Read files from the devices
+    # TODO: move this to the device cycle
     bacnet.disconnect()  # We need a custom derived class in file_reader, so close here and reopen there
     file_reader.fetch_files(db, timestamp)
-    
     db.close()
 except sqlite3.Error as e:
     with open(os.path.join(config.base_dir, config.output_filename), 'a') as fout:
@@ -229,7 +235,9 @@ except sqlite3.Error as e:
                             else:
                                 print(obj_data[prop_name], file=fout)
                     except Exception as e:
-                        print('unhandled error:', e, file=fout)
+                        print('unhandled error:', file=fout)
+                        print(traceback.format_exc(), file=fout)
+                        print('End of error', file=fout)
         print("\n\nEOF.", file=fout)
 
 # TODO: start with derived version from file_reader
