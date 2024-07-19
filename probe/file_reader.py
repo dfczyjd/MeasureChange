@@ -27,7 +27,7 @@ class ReadFile(Lite):
             iocb = IOCB(
                 self.build_request(address, fileId, start, size, is_record)
             )
-            iocb.set_timeout(5)
+            iocb.set_timeout(500)
             # pass to the BACnet stack
             deferred(self.this_application.request_io, iocb)
             self._log.debug("{:<20} {!r}".format("iocb", iocb))
@@ -87,7 +87,12 @@ def read_large_file(bacnet, address, file_id, out_file, batch_size):
         with open(out_file, 'wb') as fout:
             for batch_start in batch_range:
                 print(f'Reading {batch_size} units starting from {batch_start} (of {size})', flush=True)
-                fout.write(bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method))
+                chunk = bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method)
+                if chunk is None:
+                    print('Read failed, see exception above', flush=True)
+                    break
+                fout.write(chunk)
+                fout.flush()
     except Exception as e:
         print('Error while reading file', file_id, 'from', address)
         print(traceback.format_exc())

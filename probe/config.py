@@ -19,6 +19,11 @@ ip_whitelist.append([str(i) for i in ipaddress.IPv4Network("192.168.1.0/24")][1:
 #ip_whitelist = random.sample(ip_whitelist, 15)  # TODO TAKE 15 random samples from the full IP list FOR TESTING PURPOSE
 ###########################################################################
 
+ip_blacklist: list[IPAddressString] = [] # list of IP addresses to skip
+ip_blacklist += [
+    # Removed
+]
+
 
 ### Delays
 property_delay = 0.2  # seconds between two properties on the same device

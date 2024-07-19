@@ -6,16 +6,17 @@ from BAC0.core.io.IOExceptions import UnknownObjectError, UnknownPropertyError
 import config
 import file_reader
 
-bacnet = file_reader.ReadFile(ip=config.probe_ip)
-target = '192.168.183.3'
+bacnet = file_reader.ReadFile(ip=config.probe_ip, maxAPDULengthAccepted=1048576)
+target = '192.168.183.1'
 
 while True:
     print('>>> ', end='', flush=True)
-    cmd, args = input().split(' ', 1)
+    line = input().split(' ')
+    cmd = line[0]
+    args = line[1:]
     if cmd == 'exit':
         break
     elif cmd == 'read':
-        args = args.split()
         if len(args) < 3:
             print('Usage: read object_type object_id property_names')
             continue
@@ -32,7 +33,6 @@ while True:
         except Exception as err:
             print(f'Unknown error {err}')
     elif cmd == 'file':
-        args = args.split()
         if len(args) < 2:
             print('Usage: file file_id out_file [chunk_size]')
             continue
@@ -43,6 +43,11 @@ while True:
             file_id, out_file, chunk_size = args
         file_reader.read_large_file(bacnet, target, int(file_id), out_file, int(chunk_size))
         print('Done', flush=True)
+    elif cmd == 'target':
+        if len(args) == 1:
+            target = args[0]
+        else:
+            print('Current target is', target)
     else:
         print('Unrecognized command:', cmd)
 

@@ -10,6 +10,7 @@ import shutil
 import sqlite3
 import zlib
 import traceback
+from multiping import multi_ping
 
 from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
 
@@ -81,6 +82,7 @@ def process_device(addr, dev_id):
             values = dict()
             for key in mapping:
                 try:
+                    print('Reading', key, flush=True)
                     values[key] = bacnet.read(f'{addr} {obj[0]} {obj[1]} {key}')
                 except UnknownPropertyError:
                     values[key] = None
@@ -121,7 +123,7 @@ mappings = dict()
 for file in os.scandir('../mappings'):
     if not file.name.endswith('.yaml'):
         continue
-    if file.name == 'Binary Value.yaml':
+    if file.name in ['Binary Value.yaml', 'Binary Input.yaml', 'Binary Output.yaml', 'Analog Value.yaml', 'Analog Input.yaml', 'Analog Output.yaml']:
         continue
     with open(file, 'r') as fin:
         obj = yaml.safe_load(fin)
@@ -152,7 +154,13 @@ except sqlite3.Error as e:
         print('Exception while writing to the database:', file=fout)
         print(traceback.format_exc(), file=fout)
 
-for ip in config.ip_whitelist:
+ip_list = set(config.ip_whitelist).difference(config.ip_blacklist)
+ip_count = len(ip_list)
+print(f'Pinging {ip_count} devices', flush=True)
+ip_list = multi_ping(ip_list, timeout=2, retry=3)[0].keys()
+print(f'Ping finished, proceeding with {len(ip_list)} devices out of {ip_count}', flush=True)
+
+for ip in ip_list:
     try:
         # Add device to database, if not already present
         cur.execute('SELECT Id FROM Devices WHERE Address = ?', (ip,))
