@@ -10,7 +10,7 @@ import shutil
 import sqlite3
 import zlib
 import traceback
-from multiping import multi_ping
+from icmplib import multiping
 
 from bacpypes.basetypes import PropertyIdentifier, ObjectTypesSupported
 
@@ -157,7 +157,8 @@ except sqlite3.Error as e:
 ip_list = set(config.ip_whitelist).difference(config.ip_blacklist)
 ip_count = len(ip_list)
 print(f'Pinging {ip_count} devices', flush=True)
-ip_list = multi_ping(ip_list, timeout=2, retry=3)[0].keys()
+answers = multiping(ip_list, privileged=False)
+ip_list = [host.address for host in answers if host.is_alive]
 print(f'Ping finished, proceeding with {len(ip_list)} devices out of {ip_count}', flush=True)
 
 for ip in ip_list:
