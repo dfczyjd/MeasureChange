@@ -61,15 +61,16 @@ def verify_mapping(mapping):
     return flag
 
 def process_device(addr, dev_id):
-    print(f"Prossess device {addr}:{dev_id}")
+    print(f"Process device {addr}:{dev_id}", flush=True)
     objects = bacnet.read(f'{addr} device {dev_id} objectList')
-    print(f"Process {len(objects)} objects on device {addr}:{dev_id} (trying ReadPropertyMultiple)")
+    print(f"Process {len(objects)} objects on device {addr}:{dev_id} (trying ReadPropertyMultiple)", flush=True)
     results = dict()
     for obj in objects:
-        obj_name = obj[0] + ':' + str(obj[1])
+        obj_name = str(obj[0]) + ':' + str(obj[1])
         if obj[0] not in mappings:
             results[obj_name] = f'Skipping object type {obj[0]} (mapping not implemented)'
             continue
+        print(f'Reading object {obj_name}', flush=True)
         mapping = mappings[obj[0]]
         try:
             vals = bacnet.readMultiple(f'{addr} {obj[0]} {obj[1]} {" ".join(mapping.keys())}')
@@ -82,7 +83,7 @@ def process_device(addr, dev_id):
             values = dict()
             for key in mapping:
                 try:
-                    print('Reading', key, flush=True)
+                    print('Reading property', key, flush=True)
                     values[key] = bacnet.read(f'{addr} {obj[0]} {obj[1]} {key}')
                 except UnknownPropertyError:
                     values[key] = None
@@ -90,6 +91,7 @@ def process_device(addr, dev_id):
                     values[key] = traceback.format_exc()
                 time.sleep(config.property_delay)
         results[obj_name] = values
+    print(f'Finished processing device {addr}:{dev_id}', flush=True)
     return results
 
 def switch_db_file(new_db_file):
@@ -123,7 +125,7 @@ mappings = dict()
 for file in os.scandir('../mappings'):
     if not file.name.endswith('.yaml'):
         continue
-    if file.name in ['Binary Value.yaml', 'Binary Input.yaml', 'Binary Output.yaml', 'Analog Value.yaml', 'Analog Input.yaml', 'Analog Output.yaml']:
+    if file.name in ['Binary Value.yaml', 'Binary Output.yaml', 'Analog Value.yaml', 'Analog Input.yaml', 'Analog Output.yaml']:
         continue
     with open(file, 'r') as fin:
         obj = yaml.safe_load(fin)
@@ -173,6 +175,7 @@ for ip in ip_list:
             dev_id = row[0]
     
         # Discover the device
+        print('Attempting to discover device', flush=True)
         try:
             dev_bacnet_id = bacnet.read(f'{ip} device {0x3fffff} objectIdentifier')[1]
         except Exception as e:
@@ -212,6 +215,7 @@ for ip in ip_list:
                 if value is not None:
                     value = str(value)
                 cur.execute('INSERT INTO PropertyValues(Timestamp, Property, Value) VALUES (?, ?, ?)', (timestamp, prop_id, value))
+        print('Finished inserting values, commiting', flush=True)
         db.commit()
         
     except sqlite3.Error as e:
