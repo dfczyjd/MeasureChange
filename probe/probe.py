@@ -165,28 +165,19 @@ print(f'Ping finished, proceeding with {len(ip_list)} devices out of {ip_count}'
 
 for ip in ip_list:
     try:
-        # Add device to database, if not already present
-        cur.execute('SELECT Id FROM Devices WHERE Address = ?', (ip,))
-        row = cur.fetchone()
-        if row is None:
-            cur.execute('INSERT INTO Devices(Address) VALUES (?)', (ip,))
-            dev_id = cur.lastrowid
-        else:
-            dev_id = row[0]
-    
         # Discover the device
         print('Attempting to discover device', flush=True)
         try:
-            dev_bacnet_id = bacnet.read(f'{ip} device {0x3fffff} objectIdentifier')[1]
+            dev_id = bacnet.read(f'{ip} device {0x3fffff} objectIdentifier')[1]
         except Exception as e:
-            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, traceback.format_exc()))
+            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, ip, traceback.format_exc()))
             continue
         
         # Read the device properties
         try:
-            dev_data = process_device(ip, dev_bacnet_id)
+            dev_data = process_device(ip, dev_id)
         except Exception as e:
-            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, dev_id, traceback.format_exc()))
+            cur.execute('INSERT INTO Exceptions(Timestamp, Device, Text) VALUES (?, ?, ?)', (timestamp, ip, traceback.format_exc()))
             continue
         
         # Write collected data to the database
@@ -195,26 +186,13 @@ for ip in ip_list:
             if type(obj_data) == str:
                 print(obj_data, flush=True)
                 continue
-            obj_type, bacnet_obj_id = obj_name.split(':')
-            cur.execute('SELECT Id FROM Objects WHERE Device = ? AND Type = ? AND BACnetId = ?', (dev_id, obj_type, bacnet_obj_id))
-            row = cur.fetchone()
-            if row is None:
-                cur.execute('INSERT INTO Objects(Device, Type, BACnetId) VALUES (?, ?, ?)', (dev_id, obj_type, bacnet_obj_id))
-                obj_id = cur.lastrowid
-            else:
-                obj_id = row[0]
+            obj_type, obj_id = obj_name.split(':')
             for prop_name in obj_data:
-                cur.execute('SELECT Id FROM Properties WHERE Object = ? AND Name = ?', (obj_id, prop_name))
-                row = cur.fetchone()
-                if row is None:
-                    cur.execute('INSERT INTO Properties(Object, Name) VALUES (?, ?)', (obj_id, prop_name))
-                    prop_id = cur.lastrowid
-                else:
-                    prop_id = row[0]
                 value = obj_data[prop_name]
                 if value is not None:
                     value = str(value)
-                cur.execute('INSERT INTO PropertyValues(Timestamp, Property, Value) VALUES (?, ?, ?)', (timestamp, prop_id, value))
+                cur.execute('INSERT INTO PropertyValues(Timestamp, Device, ObjectType, ObjectId, Property, Value) VALUES (?, ?, ?, ?, ?, ?)',
+                            (timestamp, ip, obj_type, obj_id, prop_name, value))
         print('Finished inserting values, commiting', flush=True)
         db.commit()
         
@@ -225,7 +203,7 @@ for ip in ip_list:
             usedTxtFile = True
             print('Exception while writing to the database:', file=fout)
             print(traceback.format_exc(), file=fout)
-            print(f'{ip}:{dev_bacnet_id}', file=fout)
+            print(f'{ip}:{dev_id}', file=fout)
             if isinstance(obj_data, str):
                 print(f'    do not inspect; {obj_data}', file=fout)
                 continue

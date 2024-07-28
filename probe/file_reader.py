@@ -100,20 +100,18 @@ def read_large_file(bacnet, address, file_id, out_file, batch_size):
 
 
 def fetch_files(db, timestamp):
-    # Get all present files as tuples (File object database ID, Device ID, File object BACnet ID, File access method)
+    # Get all present files as tuples (Device ID, File object BACnet ID, File access method)
     files_query = """
-    SELECT DISTINCT o.Id, d.Address, o.BACnetId, pv.Value FROM Objects o
-        JOIN Devices d ON o.Device = d.Id
-        JOIN Properties p ON p.Object = o.Id AND p.Name = "fileAccessMethod"
-        JOIN PropertyValues pv ON pv.Property = p.Id
-        WHERE o.Type = "file"
+    SELECT DISTINCT Device, ObjectId, Value FROM PropertyValues
+        WHERE ObjectType = "file"
+            AND Property = "fileAccessMethod"
     """
     cur = db.cursor()
     cur.execute(files_query)
     files = cur.fetchall()
     
     bacnet = ReadFile(ip=config.probe_ip)
-    for obj_id, address, file_id, access_method in files:
+    for address, file_id, access_method in files:
         print(f'Processing file {file_id} at {address} using {access_method} method', flush=True)
         try:
             if access_method == 'recordAccess':
@@ -134,7 +132,7 @@ def fetch_files(db, timestamp):
             for batch_start in batch_range:
                 print(f'Reading {batch_size} units starting from {batch_start} (of {size})', flush=True)
                 data.append(bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method))
-            cur.execute('INSERT INTO Files(Timestamp, File, Data) VALUES (?, ?, ?)', (timestamp, obj_id, b''.join(data)))
+            cur.execute('INSERT INTO Files(Timestamp, Address, FileId, Data) VALUES (?, ?, ?, ?)', (timestamp, address, file_id, b''.join(data)))
         except Exception as e:
             print('Error while reading file', file_id, 'from', address)
             print(traceback.format_exc())
