@@ -1,33 +1,57 @@
 Schedule:
   # Required
   - Effective Period:
+      Type: datetime
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: range of dates to be active
   - List of Object Property References:
+      Type:
+        Name: list
+        Element Type: other
       Process Configuration Parameter:
         Actions:
         - add/delete
         - value change
         Desc: objects to apply the schedule
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Present Value:
+      Type: number
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: scheduled value
   - Priority for Writing:
+      Type: number
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: priority for writing scheduled value
   # Optional
+  - Description:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: object description
   - Exception Schedule:
+      Type:
+        Name: list
+        Element Type: other
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: schedules for exceptional days
   - Weekly Schedule:
+      Type:
+        Name: list
+        Element Type: other
       Process Configuration Parameter:
         Actions:
         - value change

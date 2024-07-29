@@ -1,32 +1,38 @@
 File:
   # Required
   - File Access Method:
+      Type: other
       Process Configuration Parameter:
         Actions:
         - config change
         Desc: type of file access
   - File Type:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: file's intended use
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Read Only:
+      Type: other
       Process Configuration Parameter:
         Actions:
         - config change
         Desc: toggles the write access to the file
   # Optional
   - Description:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: device description
-  - Profile Name:
-      Human Info:
-        Actions:
-        - value change
-        Desc: name of device's object profile
   - Record Count:
+      Type: other
       Process Configuration Parameter:
         Actions:
         - value change

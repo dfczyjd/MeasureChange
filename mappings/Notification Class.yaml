@@ -1,18 +1,38 @@
 Notification Class:
   # Required
   - Ack Required:
+      Type:
+        Name: list
+        Element Type: bool
       Alarm Ack Required:
         Actions:
         - value change
         Desc: several flags enabling acks to events/alarms by their types
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Priority:
+      Type: number
       Alarm Priority:
         Actions:
         - value change
         Desc: several values indicating priorities for events/alarms by their types
   - Recipient List:
+      Type:
+        Name: list
+        Element Type: other
       Monitoring Push Configuration:
         Actions:
         - activate/deactivate
         - tighten/relax
         Desc: list or recepients for events/alarms
+  # Optional
+  - Description:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: object description

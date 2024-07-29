@@ -125,8 +125,6 @@ mappings = dict()
 for file in os.scandir('../mappings'):
     if not file.name.endswith('.yaml'):
         continue
-    if file.name in ['Binary Value.yaml', 'Binary Output.yaml', 'Analog Value.yaml', 'Analog Input.yaml', 'Analog Output.yaml']:
-        continue
     with open(file, 'r') as fin:
         obj = yaml.safe_load(fin)
         mappings.update(update_names(obj))

@@ -1,30 +1,64 @@
 Event Enrollment:
   # Required
   - Event Enable:
+      Type:
+        Name: list
+        Element Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
+  - Event Parameters:
+      Type:
+        Name: list
+        Value: other
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: parameters of the monitoring algorithm
+  - Event Type:
+      Type: other
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: object + property to monitor and send notifications
   - Notify Type:
+      Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
+  - Object Property Reference:
+      Type: other
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: object + property to monitor and send notifications
   # Optional
   - Issue Confirmed Notifications:
+      Type: bool
       Alarm Ack Required:
         Actions:
         - value change
         Desc: toggles notifications as confirmed/unconfirmed
   - Notification Class:
-      Alarm Priority:
-      Alarm Ack Required:
+      Type:
+        Name: object
+        Element Type: Notification Class
   - Priority:
+      Type: number
       Alarm Priority:
         Actions:
         - value change
         Desc: priority for events/alarms
   #- Recipient:
+  #    Type: other (TODO check, m.b. object)
   #    Monitoring Push Configuration:
   #      Actions:
   #      - activate/deactivate

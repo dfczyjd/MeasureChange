@@ -1,32 +1,44 @@
 Program:
   # Required
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Out of Service:
+      Type: bool
       Device Control:
         Actions:
         - value change
         Desc: on/off state of hardware
   - Program Change:
+      Type: other
       Device Control:
         Actions:
         - value change
         Desc: controls the program updating/restarting process
   # Optional
   - Description:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: device description
   - Instance Of:
+      Type: other
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: name of the running program
   - Program Location:
+      Type: other
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: location of the running program
   - Reliability:
+      Type: other
       Device Control:
         Actions:
         - config change

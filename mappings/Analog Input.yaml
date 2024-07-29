@@ -1,0 +1,85 @@
+Analog Input:
+  # Required
+  - Out of Service:
+      Device Diagnostics:
+        Actions:
+        - config change
+        Desc: on/off state of hardware
+  - Present Value:
+      Process Input Variable:
+        Actions:
+        - override
+        Desc: writing to attribute implies override action
+  - Units:
+      Human Info:
+        Actions:
+        - value change
+        Desc: units for Present Value
+  # Optional
+  - COV Increment:
+      Monitoring Push Configuration:
+        Actions:
+        - value change
+        Desc: minimum change in Present Value to send COV notification
+  - Deadband:
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: threshold for High/Low Limit values
+  - Device Type:
+      Human Info:
+        Actions:
+        - value change
+        Desc: device description
+  - Event Enable:
+      Alarm Suppression:
+        Actions:
+        - activate/deactivate
+        Desc: several flags enabling events/alarms by their types
+  - High Limit:
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: Upper bound for an event/alarm
+  - Limit Enable:
+      Alarm Suppression:
+        Actions:
+        - activate/deactivate
+        Desc: Flags to enable a limit event/alarm
+  - Low Limit:
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: Lower bound for an event/alarm
+  - Min Pres Value:
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: Upper bound for an event/alarm
+  - Max Pres Value:
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: Upper bound for an event/alarm
+  - Notification Class:
+      Alarm Priority:
+      Alarm Ack Required:
+  - Notify Type:
+      Alarm Suppression:
+        Actions:
+        - activate/deactivate
+        Desc: toggles between event and alarm types for notifications
+  - Reliability:
+      Process Input Variable:
+        Actions:
+        - config change
+        Desc: indicates whether the value is reliable
+      Human Info:
+        Actions:
+        - value change
+        Desc: specifies the reason of value's unreliability, if any
+  - Time Delay:
+      Alarm Condition:
+        Actions:
+        - tighten/relax
+        Desc: time limit for Present Value to be out of bounds to raise an event/alarm

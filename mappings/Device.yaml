@@ -1,109 +1,149 @@
 Device:
   # Required
-  - APDU Timeout:
-      Device Configuration:
-        Actions:
-        - value change
-        Desc: protocol messages timeout
   - Application Software Version:
+      Type: other
       Device Configuration:
         Actions:
         - value change
         Desc: software version
+  - Device Address Binding:
+      Type:
+        Name: list
+        Element Type: other
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: list of addresses associated with device
   - Firmware Revision:
+      Type: other
       Device Configuration:
         Actions:
         - value change
         Desc: firmware version
   - Number of APDU Retries:
+      Type: number
       Device Configuration:
         Actions:
         - value change
         Desc: number of protocol message retries
   - Object List:
-      #TODO: come up with a way to reference other objects here
-      Unknown:
-        Actions:
-        - add/delete
+      Type:
+        Name: list
+        Element Type:
+          Name: object
+          Element Type: dynamic
   - Object Name:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: device name
+  #- Protocol Conformance Class:
+  #    Type: other
+  #    Device Configuration:
+  #      Actions:
+  #      - value change
+  #      Desc: indicates minset of supported object types
+  - Protocol Object Types Supported:
+      Type:
+        Name: list
+        Element Type: other
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: complete set of supported object types
   - Protocol Revision:
+      Type: number
       Device Configuration:
         Actions:
         - value change
         Desc: protocol minor revision level
+  - Protocol Services Supported:
+      Type:
+        Name: list
+        Element Type: other
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: complete set of supported services
   - Protocol Version:
       Device Configuration:
         Actions:
         - value change
         Desc: protocol version
+  - Segmentation Supported:
+      Type: other
+      Device Configuration:
+        Actions:
+        - value change
+        Desc: level of supported message segmentation
   # Optional
   - Active COV Subscriptions:
+      Type:
+        Name: list
+        Element Type: other
       Monitoring Push Configuration:
         Actions:
         - activate/deactivate
         - tighten/relax
-        Desc: list of COV recepients
-  - APDU Segment Timeout:
-      Device Configuration:
-        Actions:
-        - value change
-        Desc: protocol message segment timeout
+        Desc: list of COV recipients
   - Backup Failure Timeout:
+      Type: number
       Device Configuration:
         Actions:
         - value change
         Desc: timeout for backup or restoration procedure to fail
   - Configuration Files:
+      Type:
+        Name: list
+        Element Type: other
       Device Configuration:
         Actions:
         - value change
         Desc: files to be used in backup procedure
   - Daylight Savings Status:
+      Type: bool
       Process Control Variable:
         Actions:
         - value change
         Desc: toggles daylight saving time
   - Description:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: device description
   - List of Session Keys:
+      Type:
+        Name: list
+        Element Type: other
       Device Configuration:
         Actions:
         - add/delete
         - value change
         Desc: list of cryptographic session keys
   - Location:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: device location
-  - Max Info Frames:
-      Device Configuration:
-        Actions:
-        - value change
-        Desc: maximum number of frames before MS/TP token
-  - Max Master:
-      Device Configuration:
-        Actions:
-        - value change
-        Desc: highest possible address for master MS/TP nodes
   - Max Segments Accepted:
+      Type: number
       Device Configuration:
         Actions:
         - value change
         Desc: maximum number of protocol segments accepted
   - Profile Name:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: name of device's object profile
   - Time Synchronization Recipients:
+      Type:
+        Name: list
+        Element Type: other
       Monitoring Push Configuration:
         Actions:
         - tighten/relax
