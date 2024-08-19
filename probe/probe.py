@@ -113,7 +113,7 @@ def switch_db_file(new_db_file):
                         fout.write(compress.compress(data))
                     fout.write(compress.flush())
             print('Successfully compressed file to', file + '.zip', flush=True)
-            shutil.move(file, file + '_compressed')
+            os.remove(file)
     except Exception as e:
         print('Exception while compressing old databases:')
         print(traceback.format_exc())
