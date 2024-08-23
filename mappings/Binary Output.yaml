@@ -1,65 +1,108 @@
 Binary Output:
   # Required
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Out of Service:
+      Type: bool
       Device Diagnostics:
         Actions:
         - config change
         Desc: on/off state of hardware
   - Polarity:
+      Type: bool
       Device Diagnostics:
         Actions:
         - config change
         Desc: inverts the meaning behind active/inactive states in Present Value
+  - Present Value:
+      Type: bool
+      Process Output Variable:
+        Actions:
+        - override
+        Desc: writing to attribute might imply override action
+  - Status Flags:
+      Type:
+        Name: list
+        Element Type: bool
+      Device Diagnostics:
+        Actions:
+        - value change
+        Desc: hardware health status flags
   # Optional
   - Active Text:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: helper text displayed in the active state
+  - Description:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: object description
   - Device Type:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: device description
   - Event Enable:
+      Type:
+        Name: list
+        Element Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
   - Feedback Value:
+      Type: bool
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: specifies the non-alerting present value
   - Inactive Text:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: helper text displayed in the inactive state
   - Minimum Off Time:
+      Type: number
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: minimum time to spend in off state to set present value to it
   - Minimum On Time:
+      Type: number
       Process Configuration Parameter:
         Actions:
         - value change
         Desc: minimum time to spend in on state to set present value to it
   - Notification Class:
-      Alarm Priority:
-      Alarm Ack Required:
+      Type:
+        Name: object
+        Element Type: Notification Class
   - Notify Type:
+      Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   - Priority Array:
+      Type:
+        Name: list
+        Element Type: bool
       Process Output Variable:
         Actions:
         - override
         Desc: writing to some values might imply override action
   - Reliability:
+      Type: other
       Process Output Variable:
         Actions:
         - config change
@@ -69,11 +112,13 @@ Binary Output:
         - value change
         Desc: specifies the reason of value's unreliability, if any
   - Relinquish Default:
+      Type: bool
       Process Output Variable:
         Actions:
         - override
         Desc: writing to attribute might imply override action
   - Time Delay:
+      Type: number
       Alarm Condition:
         Actions:
         - tighten/relax

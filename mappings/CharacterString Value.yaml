@@ -1,50 +1,86 @@
 CharacterString Value:
   # Required
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Present Value:
+      Type: other
       Process Input Variable:
         Actions:
         - override
-        Desc: writing to attribute implies override action
+        Desc: writing to attribute might imply override action
+      Process Output Variable:
+        Actions:
+        - override
+        Desc: writing to attribute might imply override action
+  - Status Flags:
+      Type:
+        Name: list
+        Element Type: bool
+      Device Diagnostics:
+        Actions:
+        - value change
+        Desc: hardware health status flags
   # Optional
   - Alarm Values:
+      Type:
+        Name: list
+        Element Type: other
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: values for Present Value to raise an event/alarm
   - Description:
+      Type: other
       Human Info:
         Actions:
         - value change
-        Desc: device description
+        Desc: object description
   - Event Enable:
+      Type:
+        Name: list
+        Element Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
   - Fault Values:
+      Type:
+        Name: list
+        Element Type: other
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: values for Present Value to raise an event/alarm
   - Notification Class:
-      Alarm Priority:
-      Alarm Ack Required:
+      Type:
+        Name: object
+        Element Type: Notification Class
   - Notify Type:
+      Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   - Out of Service:
+      Type: bool
       Device Control:
         Actions:
         - value change
         Desc: on/off state of hardware
   - Priority Array:
+      Type:
+        Name: list
+        Element Type: other
       Process Output Variable:
         Actions:
         - config change
         Desc: commands to define output value
   - Reliability:
+      Type: other
       Process Output Variable:
         Actions:
         - config change
@@ -54,11 +90,13 @@ CharacterString Value:
         - value change
         Desc: specifies the reason of value's unreliability, if any
   - Relinquish Default:
+      Type: other
       Process Output Variable:
         Actions:
         - config change
         Desc: default output value
   - Time Delay:
+      Type: other
       Alarm Condition:
         Actions:
         - tighten/relax

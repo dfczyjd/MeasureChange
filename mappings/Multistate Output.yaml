@@ -1,50 +1,78 @@
 Multistate Output:
   # Required
   - Number of States:
+      Type: number
       Process Output Variable:
         Actions:
         - config change
         Desc: number of possible states
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Out of Service:
+      Type: bool
       Device Control:
         Actions:
         - value change
         Desc: on/off state of hardware
   - Priority Array:
+      Type:
+        Name: list
+        Element Type: other
       Process Output Variable:
         Actions:
         - config change
         Desc: commands to define output value
   - Relinquish Default:
+      Type: other
       Process Output Variable:
         Actions:
         - config change
         Desc: default output value
   # Optional
+  - Description:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: object description
   - Device Type:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: description of the connected device
   - Event Enable:
+      Type:
+        Name: list
+        Element Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
   - Feedback Value:
+      Type:
+        Name: list
+        Element Type: other
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: threshold for output value to generate an alert
   - Notification Class:
-      Alarm Priority:
-      Alarm Ack Required:
+      Type:
+        Name: object
+        Element Type: Notification Class
   - Notify Type:
+      Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   - Reliability:
+      Type: other
       Process Output Variable:
         Actions:
         - config change
@@ -54,11 +82,15 @@ Multistate Output:
         - value change
         Desc: specifies the reason of value's unreliability, if any
   - State Text:
+      Type:
+        Name: list
+        Element Type: other
       Human Info:
         Actions:
         - value change
         Desc: state descriptions
   - Time Delay:
+      Type: number
       Alarm Condition:
         Actions:
         - tighten/relax

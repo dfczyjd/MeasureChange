@@ -1,85 +1,155 @@
 Pulse Converter:
   # Required
   - Adjust Value:
+      Type: number
       Process Input Variable:
         Actions:
         - override
         Desc: writing to attribute shifts present value by given number
+  - Count:
+      Type: number
+      # TODO: not really, it's complicated
+      Process Configuration Variable:
+        Actions:
+        - value change
+        Desc: unknown (no docs found)
+  - Count Change Time:
+      Type: other
+      # TODO: not really, it's complicated
+      Process Configuration Variable:
+        Actions:
+        - value change
+        Desc: unknown (no docs found)
+  - Object Name:
+      Type: other
+      Human Info:
+        Actions:
+        - value change
+        Desc: name of the object
   - Out of Service:
+      Type: bool
       Device Control:
         Actions:
         - value change
         Desc: on/off state of hardware
   - Present Value:
+      Type: number
       Process Input Variable:
         Actions:
         - override
         Desc: writing to attribute implies override action
   - Scale Factor:
+      Type: number
       Process Input Variable:
         Actions:
         - config change
         Desc: scale ratio between present value and actual reading
+  - Status Flags:
+      Type:
+        Name: list
+        Element Type: bool
+      Device Diagnostics:
+        Actions:
+        - value change
+        Desc: hardware health status flags
   - Units:
+      Type: other
       Human Info:
         Actions:
         - value change
         Desc: measurement units
+  - Update Time:
+      Type: other
+      # TODO: not really, it's complicated
+      Process Configuration Variable:
+        Actions:
+        - value change
+        Desc: unknown (no docs found)
   # Optional
   - COV Increment:
+      Type: number
       Monitoring Push Configuration:
         Actions:
         - tighten/relax
         Desc: minimum change in value to send a change-of-value notification
   - COV Period:
+      Type: number
       Monitoring Push Configuration:
         Actions:
         - value change
         Desc: time delay between periodic change-of-value notifications
+  - Count Before Change:
+      Type: number
+      # TODO: not really, it's complicated
+      Process Configuration Variable:
+        Actions:
+        - value change
+        Desc: unknown (no docs found)
   - Deadband:
+      Type: number
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: sets boundary for Present Value to deactivate an event/alarm
   - Description:
+      Type: other
       Human Info:
         Actions:
         - value change
-        Desc: device description
+        Desc: object description
   - Event Enable:
+      Type:
+        Name: list
+        Element Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
+  - Event Message Texts:
+      Type: other
+      # TODO: not really, it's complicated
+      Human Info:
+        Actions:
+        - value change
+        Desc: unknown (no docs found)
   - High Limit:
+      Type: number
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: upper bound for Present Value to raise an event/alarm
   - Input Reference:
+      Type: other
       Monitoring Pull Configuration:
         Actions:
         - activate/deactivate
         Desc: reference to property containing actual value
   - Limit Enable:
+      Type:
+        Name: list
+        Element Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms for present value crossing the bounds
   - Low Limit:
+      Type: number
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: lower bound for Present Value to raise an event/alarm
   - Notification Class:
-      Alarm Priority:
-      Alarm Ack Required:
+      Type:
+        Name: object
+        Element Type: Notification Class
   - Notify Type:
+      Type: bool
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   - Reliability:
+      Type: other
       Process Input Variable:
         Actions:
         - config change
@@ -89,6 +159,7 @@ Pulse Converter:
         - value change
         Desc: specifies the reason of value's unreliability, if any
   - Time Delay:
+      Type: number
       Alarm Condition:
         Actions:
         - tighten/relax
