@@ -53,7 +53,7 @@ class ReadFile(Lite):
         if iocb.ioError:  # unsuccessful: error/reject/abort
             apdu = iocb.ioError
             reason = find_reason(apdu)
-            print('Error reading file:', reason)
+            raise Exception('Error reading file: ' + reason)
         return None
     
     def build_request(self, address, fileId, start, size, is_record):
@@ -113,6 +113,7 @@ def fetch_files(db, timestamp):
     bacnet = ReadFile(ip=config.probe_ip)
     for address, file_id, access_method in files:
         print(f'Processing file {file_id} at {address} using {access_method} method', flush=True)
+        data = []
         try:
             if access_method == 'recordAccess':
                 batch_size = config.record_batch_size
@@ -128,14 +129,16 @@ def fetch_files(db, timestamp):
                     print(f'File too big ({size} bytes), skipping', flush=True)
                     continue
                 batch_range = range(0, size, config.stream_batch_size)
-            data = []
             for batch_start in batch_range:
                 print(f'Reading {batch_size} units starting from {batch_start} (of {size})', flush=True)
                 data.append(bacnet.read_file(address, ('file', file_id), batch_start, batch_size, access_method))
-            cur.execute('INSERT INTO Files(Timestamp, Address, FileId, Data) VALUES (?, ?, ?, ?)', (timestamp, address, file_id, b''.join(data)))
         except Exception as e:
             print('Error while reading file', file_id, 'from', address)
             print(traceback.format_exc())
             print('End of error', flush=True)
+        if len(data) == 0:
+            print('Got empty file; nothing to write to database')
+        else:
+            cur.execute('INSERT INTO Files(Timestamp, Address, FileId, Data) VALUES (?, ?, ?, ?)', (timestamp, address, file_id, b''.join(data)))
     db.commit()
     bacnet.disconnect()
