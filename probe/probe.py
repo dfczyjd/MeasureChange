@@ -225,6 +225,10 @@ for ip in ip_list:
     # Wait before polling the next device to avoid network overload
     time.sleep(config.device_delay)
 
+if config.enable_capture:
+    print('Dumping packets to a file', flush=True)
+    patch.write_packets()
+
 if usedTxtFile:
     with open(os.path.join(config.base_dir, config.output_filename), 'a') as fout:
         print("\n\nEOF.", file=fout)

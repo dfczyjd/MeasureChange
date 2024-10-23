@@ -49,3 +49,10 @@ db_base_file = 'base.sqlite3'
 # Text output file for cases, when writing to database failed
 output_filename = pathlib.Path.home() / "vasily_results" / f"data{time.strftime('%Y%m%dT%H%M', time.localtime())}_localtime.txt"
 output_filename = output_filename.as_posix()
+
+# Set to True to enable packet capture
+enable_capture = True
+# File to write packets to
+capture_output_file = 'capture.pcap'
+# List of IP addresses to capture packets from/to
+capture_target_ip = ['192.168.183.1']

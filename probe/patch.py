@@ -5,6 +5,13 @@ from BAC0.core.io.IOExceptions import *
 from BAC0.scripts import Lite
 import bacpypes.basetypes
 
+from bacpypes.udp import UDPDirector
+from bacpypes.comm import PDU
+import dpkt
+import socket
+
+import config
+
 def build_rpm_request_patch(self, args, vendor_id = 0):
     self._log.debug(args)
     i = 0
@@ -281,3 +288,94 @@ for _, typ in inspect.getmembers(bacpypes.basetypes, inspect.isclass):
             typ.__repr__ = dump
         elif typ.__str__ is object.__str__:
             typ.__repr__ = str_wrap
+
+
+
+# For illegal values detection only
+packets = []
+udp_template = b"\xff\xff\xff\xff\xff\xff\n\x00'\x00\x00\x05\x08\x00E\x00%b\x00\x01\x00\x00@\x11\x8bh%b%b%b%b%b\xde\xad%b"
+
+def handle_read_patch(self):
+    _debug = False
+    if _debug: UDPDirector._debug("handle_read(%r)", self.address)
+
+    try:
+        msg, addr = self.socket.recvfrom(65536)
+        if _debug: UDPDirector._debug("    - received %d octets from %s", len(msg), addr)
+
+        if config.enable_capture and config.capture_target_ip == addr[0]:
+            try:
+                packet = udp_template % \
+                    ((len(msg) + 28).to_bytes(2, 'big'),    # IP packet length
+                     socket.inet_aton(addr[0]),             # Source IP
+                     socket.inet_aton(config.probe_ip),     # Destination IP
+                     addr[1].to_bytes(2, 'big'),            # Source port
+                     b'\xba\xc0',                           # Destination port
+                     (len(msg) + 8).to_bytes(2, 'big'),     # UDP packet length
+                     msg                                    # Payload
+                    )
+                packets.append(packet)
+            except Exception as e:
+                print(e)
+
+        # send the PDU up to the client
+        deferred(self._response, PDU(msg, source=addr))
+
+    except socket.timeout as err:
+        if _debug: UDPDirector._debug("    - socket timeout: %s", err)
+
+    except socket.error as err:
+        if err.args[0] == 11:
+            pass
+        else:
+            if _debug: UDPDirector._debug("    - socket error: %s", err)
+
+            # pass along to a handler
+            self.handle_error(err)
+
+def handle_write_patch(self):
+    _debug = False
+    """get a PDU from the queue and send it."""
+    if _debug: UDPDirector._debug("handle_write(%r)", self.address)
+
+    try:
+        pdu = self.request.get()
+
+        if config.enable_capture and config.capture_target_ip == pdu.pduDestination[0]:
+            try:
+                packet = udp_template % \
+                        ((len(pdu.pduData) + 28).to_bytes(2, 'big'),    # IP packet length
+                         socket.inet_aton(config.probe_ip),             # Source IP
+                         socket.inet_aton(pdu.pduDestination[0]),       # Destination IP
+                         b'\xba\xc0',                                   # Source port
+                         pdu.pduDestination[1].to_bytes(2, 'big'),      # Destination port
+                         (len(pdu.pduData) + 8).to_bytes(2, 'big'),     # UDP packet length
+                         pdu.pduData                                    # Payload
+                        )
+                packets.append(packet)
+            except Exception as e:
+                print(e)
+
+        sent = self.socket.sendto(pdu.pduData, pdu.pduDestination)
+        if _debug: UDPDirector._debug("    - sent %d octets to %s", sent, pdu.pduDestination)
+
+    except socket.error as err:
+        if _debug: UDPDirector._debug("    - socket error: %s", err)
+
+        # get the peer
+        peer = self.peers.get(pdu.pduDestination, None)
+        if peer:
+            # let the actor handle the error
+            peer.handle_error(err)
+        else:
+            # let the director handle the error
+            self.handle_error(err)
+
+def write_packets():
+    with open(config.capture_output_file, 'wb') as fout:
+        write = dpkt.pcap.Writer(fout)
+        for elem in packets:
+            write.writepkt(elem)
+
+UDPDirector.handle_read = handle_read_patch
+UDPDirector.handle_write = handle_write_patch
