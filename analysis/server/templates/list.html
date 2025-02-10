@@ -1,0 +1,74 @@
+<html>
+<head>
+    <style>
+        ul, #myUL {
+          list-style-type: none;
+        }
+        
+        #myUL {
+          margin: 0;
+          padding: 0;
+        }
+        
+        .caret {
+          cursor: pointer;
+          user-select: none;
+        }
+        
+        .caret::before {
+          content: "\25B6";
+          color: black;
+          display: inline-block;
+          margin-right: 6px;
+        }
+        
+        .caret-down::before {
+          transform: rotate(90deg);
+        }
+        
+        .nested {
+          display: none;
+        }
+        
+        .active {
+          display: block;
+        }
+    </style>
+</head>
+<body>
+    <form action="/fast_list" method="GET">
+        <select name="id">
+            {% for feat in features %}
+            <option value={{ feat[0] }} {% if feat_id == feat[0] %} selected {% endif %}>{{ feat[1] }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Display"/>
+    </form>
+    {% if results %}
+    Displaying {{ features[feat_id] }}<br/>
+    <ul id="myUL">
+        {% for time, values in items %}
+        <li><span class="caret">{{ time }}</span>
+            <ul class="nested">
+                {% for value, color in values %}
+                <li style="color:{{ color }}">{{ value }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+    <script>
+      var toggler = document.getElementsByClassName("caret");
+      var i;
+      
+      for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", function() {
+          console.log("Click");
+          this.parentElement.querySelector(".nested").classList.toggle("active");
+          this.classList.toggle("caret-down");
+        });
+      }
+    </script>
+    {% endif %}
+</body>
+</html>

@@ -2,26 +2,25 @@ Event Enrollment:
   # Required
   - Event Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Suppression:
         Actions:
         - activate/deactivate
         Desc: several flags enabling events/alarms by their types
   - Event Parameters:
-      Type:
-        Name: list
-        Value: other
+      Type: other
       Alarm Condition:
         Actions:
         - tighten/relax
         Desc: parameters of the monitoring algorithm
   - Event Type:
-      Type: other
+      Type: enum
       Alarm Condition:
         Actions:
         - tighten/relax
-        Desc: object + property to monitor and send notifications
+        Desc: monitoring algorithm to use
   - Notify Type:
       Type: bool
       Alarm Suppression:
@@ -35,7 +34,9 @@ Event Enrollment:
         - value change
         Desc: name of the object
   - Object Property Reference:
-      Type: other
+      Type:
+        Name: struct
+        Type: Object Property Reference
       Alarm Condition:
         Actions:
         - tighten/relax
@@ -51,15 +52,10 @@ Event Enrollment:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Priority:
       Type: number
       Alarm Priority:
         Actions:
         - value change
         Desc: priority for events/alarms
-  #- Recipient:
-  #    Type: other (TODO check, m.b. object)
-  #    Monitoring Push Configuration:
-  #      Actions:
-  #      - activate/deactivate
-  #      Desc: recipient of the notification

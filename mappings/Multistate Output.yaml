@@ -20,14 +20,15 @@ Multistate Output:
         Desc: on/off state of hardware
   - Priority Array:
       Type:
-        Name: list
-        Element Type: other
+        Name: array
+        Element Type: enum
+        Length: 16
       Process Output Variable:
         Actions:
         - config change
         Desc: commands to define output value
   - Relinquish Default:
-      Type: other
+      Type: enum
       Process Output Variable:
         Actions:
         - config change
@@ -47,8 +48,9 @@ Multistate Output:
         Desc: description of the connected device
   - Event Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Suppression:
         Actions:
         - activate/deactivate
@@ -56,7 +58,7 @@ Multistate Output:
   - Feedback Value:
       Type:
         Name: list
-        Element Type: other
+        Element Type: invalid
       Alarm Condition:
         Actions:
         - tighten/relax
@@ -65,6 +67,7 @@ Multistate Output:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Notify Type:
       Type: bool
       Alarm Suppression:
@@ -72,7 +75,7 @@ Multistate Output:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   - Reliability:
-      Type: other
+      Type: enum
       Process Output Variable:
         Actions:
         - config change

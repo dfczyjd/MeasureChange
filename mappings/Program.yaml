@@ -38,7 +38,7 @@ Program:
         - value change
         Desc: location of the running program
   - Reliability:
-      Type: other
+      Type: enum
       Device Control:
         Actions:
         - config change

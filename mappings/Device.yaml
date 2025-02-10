@@ -9,7 +9,9 @@ Device:
   - Device Address Binding:
       Type:
         Name: list
-        Element Type: other
+        Element Type:
+          Name: struct
+          Type: Device Address Binding
       Device Configuration:
         Actions:
         - value change
@@ -29,25 +31,18 @@ Device:
   - Object List:
       Type:
         Name: list
-        Element Type:
-          Name: object
-          Element Type: dynamic
+        Element Type: other
   - Object Name:
       Type: other
       Human Info:
         Actions:
         - value change
         Desc: device name
-  #- Protocol Conformance Class:
-  #    Type: other
-  #    Device Configuration:
-  #      Actions:
-  #      - value change
-  #      Desc: indicates minset of supported object types
   - Protocol Object Types Supported:
       Type:
-        Name: list
-        Element Type: other
+        Name: array
+        Element Type: bool
+        Length: 51
       Device Configuration:
         Actions:
         - value change
@@ -60,13 +55,15 @@ Device:
         Desc: protocol minor revision level
   - Protocol Services Supported:
       Type:
-        Name: list
-        Element Type: other
+        Name: array
+        Element Type: bool
+        Length: 40
       Device Configuration:
         Actions:
         - value change
         Desc: complete set of supported services
   - Protocol Version:
+      Type: number
       Device Configuration:
         Actions:
         - value change
@@ -81,7 +78,9 @@ Device:
   - Active COV Subscriptions:
       Type:
         Name: list
-        Element Type: other
+        Element Type:
+          Name: struct
+          Type: COV Subscription
       Monitoring Push Configuration:
         Actions:
         - activate/deactivate
@@ -147,4 +146,4 @@ Device:
       Monitoring Push Configuration:
         Actions:
         - tighten/relax
-        Desc: list of recepients of Time Synchronization request
+        Desc: list of recipients of Time Synchronization request

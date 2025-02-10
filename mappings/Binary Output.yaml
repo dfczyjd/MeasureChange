@@ -26,8 +26,9 @@ Binary Output:
         Desc: writing to attribute might imply override action
   - Status Flags:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 4
       Device Diagnostics:
         Actions:
         - value change
@@ -53,8 +54,9 @@ Binary Output:
         Desc: device description
   - Event Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Suppression:
         Actions:
         - activate/deactivate
@@ -87,6 +89,7 @@ Binary Output:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Notify Type:
       Type: bool
       Alarm Suppression:
@@ -95,14 +98,15 @@ Binary Output:
         Desc: toggles between event and alarm types for notifications
   - Priority Array:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 16
       Process Output Variable:
         Actions:
         - override
         Desc: writing to some values might imply override action
   - Reliability:
-      Type: other
+      Type: enum
       Process Output Variable:
         Actions:
         - config change

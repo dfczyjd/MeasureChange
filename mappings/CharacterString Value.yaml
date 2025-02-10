@@ -18,8 +18,9 @@ CharacterString Value:
         Desc: writing to attribute might imply override action
   - Status Flags:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 4
       Device Diagnostics:
         Actions:
         - value change
@@ -41,8 +42,9 @@ CharacterString Value:
         Desc: object description
   - Event Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Suppression:
         Actions:
         - activate/deactivate
@@ -59,6 +61,7 @@ CharacterString Value:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Notify Type:
       Type: bool
       Alarm Suppression:
@@ -73,14 +76,15 @@ CharacterString Value:
         Desc: on/off state of hardware
   - Priority Array:
       Type:
-        Name: list
-        Element Type: other
+        Name: array
+        Element Type: number
+        Length: 16
       Process Output Variable:
         Actions:
         - config change
         Desc: commands to define output value
   - Reliability:
-      Type: other
+      Type: enum
       Process Output Variable:
         Actions:
         - config change
@@ -96,7 +100,7 @@ CharacterString Value:
         - config change
         Desc: default output value
   - Time Delay:
-      Type: other
+      Type: number
       Alarm Condition:
         Actions:
         - tighten/relax

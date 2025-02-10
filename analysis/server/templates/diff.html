@@ -1,0 +1,94 @@
+<html>
+<head>
+    <style>
+        ul, #myUL {
+          list-style-type: none;
+        }
+        
+        #myUL {
+          margin: 0;
+          padding: 0;
+        }
+        
+        .caret {
+          cursor: pointer;
+          user-select: none;
+        }
+        
+        .caret::before {
+          content: "\25B6";
+          color: black;
+          display: inline-block;
+          margin-right: 6px;
+        }
+        
+        .caret-down::before {
+          transform: rotate(90deg);
+        }
+        
+        .nested {
+          display: none;
+        }
+        
+        .active {
+          display: block;
+        }
+    </style>
+</head>
+<body>
+    <form action="/diff" method="GET">
+        <select name="first">
+            {% for time in times %}
+            <option value={{ time[0] }} {% if first == time[0] %} selected {% endif %}>{{ time[1] }}</option>
+            {% endfor %}
+        </select>
+        to
+        <select name="second">
+            {% for time in times %}
+            <option value={{ time[0] }} {% if second == time[0] %} selected {% endif %}>{{ time[1] }}</option>
+            {% endfor %}
+        </select>
+        <input type="checkbox" name="showAll" {% if showAll %} checked {% endif %}>Show all properties</input>
+        <br/>
+        <input type="submit" value="Compare"/>
+    </form>
+    {% if results %}
+    Comparing "{{ times[first][1] }}" to "{{ times[second][1] }}"<br/>
+    <ul id="myUL">
+        {% for dev in data.keys() %}
+        <li><span class="caret">{{ dev }}</span>
+            <ul class="nested">
+                {% for obj in data[dev].keys() %}
+                <li><span class="caret">{{ obj }}</span>
+                    <ul class="nested">
+                        {% for prop in data[dev][obj].keys() %}
+                        <li>{{ prop }}</pan>
+                            <ul>
+                                {% for time, value in data[dev][obj][prop] %}
+                                <li>{{ time }}: {{ value }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+    <script>
+      var toggler = document.getElementsByClassName("caret");
+      var i;
+      
+      for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", function() {
+          console.log("Click");
+          this.parentElement.querySelector(".nested").classList.toggle("active");
+          this.classList.toggle("caret-down");
+        });
+      }
+    </script>
+    {% endif %}
+</body>
+</html>

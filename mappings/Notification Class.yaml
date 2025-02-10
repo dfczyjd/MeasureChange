@@ -2,8 +2,9 @@ Notification Class:
   # Required
   - Ack Required:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Ack Required:
         Actions:
         - value change
@@ -23,7 +24,9 @@ Notification Class:
   - Recipient List:
       Type:
         Name: list
-        Element Type: other
+        Element Type:
+          Name: struct
+          Type: Recipient
       Monitoring Push Configuration:
         Actions:
         - activate/deactivate

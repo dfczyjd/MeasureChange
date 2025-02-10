@@ -1,0 +1,15 @@
+Recipient:
+  validDays:
+    Name: array
+    Element Type: bool
+    Length: 7
+  fromTime: datetime
+  toTime: datetime
+  recipient:
+    device: other
+  processIdentifier: other
+  issueConfirmedNotifications: bool
+  transitions:
+    Name: array
+    Element Type: bool
+    Length: 3

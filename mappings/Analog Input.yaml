@@ -20,8 +20,9 @@ Analog Input:
         Desc: writing to attribute implies override action
   - Status Flags:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 4
       Device Diagnostics:
         Actions:
         - value change
@@ -59,8 +60,9 @@ Analog Input:
         Desc: device description
   - Event Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Suppression:
         Actions:
         - activate/deactivate
@@ -73,8 +75,9 @@ Analog Input:
         Desc: Upper bound for an event/alarm
   - Limit Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 2
       Alarm Suppression:
         Actions:
         - activate/deactivate
@@ -101,6 +104,7 @@ Analog Input:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Notify Type:
       Type: bool
       Alarm Suppression:
@@ -108,7 +112,7 @@ Analog Input:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   - Reliability:
-      Type: other
+      Type: enum
       Process Input Variable:
         Actions:
         - config change

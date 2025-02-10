@@ -3,3 +3,8 @@ probe/__pycache__
 probe/base.sqlite3
 probe/drop_db.bat
 mwe/run.sh
+*.sqlite3
+__pycache__
+.ipynb_checkpoints
+analysis/findings
+*.pickle

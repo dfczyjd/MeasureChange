@@ -8,14 +8,12 @@ Pulse Converter:
         Desc: writing to attribute shifts present value by given number
   - Count:
       Type: number
-      # TODO: not really, it's complicated
       Process Configuration Variable:
         Actions:
         - value change
         Desc: unknown (no docs found)
   - Count Change Time:
-      Type: other
-      # TODO: not really, it's complicated
+      Type: datetime
       Process Configuration Variable:
         Actions:
         - value change
@@ -59,8 +57,7 @@ Pulse Converter:
         - value change
         Desc: measurement units
   - Update Time:
-      Type: other
-      # TODO: not really, it's complicated
+      Type: datetime
       Process Configuration Variable:
         Actions:
         - value change
@@ -80,7 +77,6 @@ Pulse Converter:
         Desc: time delay between periodic change-of-value notifications
   - Count Before Change:
       Type: number
-      # TODO: not really, it's complicated
       Process Configuration Variable:
         Actions:
         - value change
@@ -107,7 +103,6 @@ Pulse Converter:
         Desc: several flags enabling events/alarms by their types
   - Event Message Texts:
       Type: other
-      # TODO: not really, it's complicated
       Human Info:
         Actions:
         - value change
@@ -142,6 +137,7 @@ Pulse Converter:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Notify Type:
       Type: bool
       Alarm Suppression:

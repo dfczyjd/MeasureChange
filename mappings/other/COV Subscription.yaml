@@ -1,0 +1,11 @@
+COV Subscription:
+  recipient:
+    recipient:
+      address:
+        networkNumber: other
+        macAddress: other
+    processIdentifier: other
+  monitoredPropertyReference:
+    objectIdentifier: other
+    propertyIdentifier: other
+  issueConfirmedNotifications: bool

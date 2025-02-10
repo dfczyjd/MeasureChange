@@ -1,7 +1,9 @@
 Schedule:
   # Required
   - Effective Period:
-      Type: datetime
+      Type:
+        Name: struct
+        Type: Effective Period
       Process Configuration Parameter:
         Actions:
         - value change
@@ -9,7 +11,9 @@ Schedule:
   - List of Object Property References:
       Type:
         Name: list
-        Element Type: other
+        Element Type:
+          Name: struct
+          Type: Object Property Reference
       Process Configuration Parameter:
         Actions:
         - add/delete

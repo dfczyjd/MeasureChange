@@ -14,8 +14,9 @@ Multistate Value:
         Desc: on/off state of hardware
   - Status Flags:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 4
       Device Diagnostics:
         Actions:
         - value change
@@ -24,7 +25,7 @@ Multistate Value:
   - Alarm Values:
       Type:
         Name: list
-        Element Type: other
+        Element Type: enum
       Alarm Condition:
         Actions:
         - tighten/relax
@@ -37,8 +38,9 @@ Multistate Value:
         Desc: object description
   - Event Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Suppression:
         Actions:
         - activate/deactivate
@@ -46,7 +48,7 @@ Multistate Value:
   - Fault Values:
       Type:
         Name: list
-        Element Type: other
+        Element Type: enum
       Alarm Condition:
         Actions:
         - tighten/relax
@@ -55,6 +57,7 @@ Multistate Value:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Notify Type:
       Type: bool
       Alarm Suppression:
@@ -63,14 +66,15 @@ Multistate Value:
         Desc: toggles between event and alarm types for notifications
   - Priority Array:
       Type:
-        Name: list
-        Element Type: other
+        Name: array
+        Element Type: enum
+        Length: 16
       Process Output Variable:
         Actions:
         - override
         Desc: writing to some values might imply override action
   - Reliability:
-      Type: other
+      Type: enum
       Process Input Variable:
         Actions:
         - config change
@@ -80,7 +84,7 @@ Multistate Value:
         - value change
         Desc: specifies the reason of value's unreliability, if any
   - Relinquish Default:
-      Type: other
+      Type: enum
       Process Output Variable:
         Actions:
         - override

@@ -1,7 +1,7 @@
 File:
   # Required
   - File Access Method:
-      Type: other
+      Type: bool
       Process Configuration Parameter:
         Actions:
         - config change
@@ -19,7 +19,7 @@ File:
         - value change
         Desc: name of the object
   - Read Only:
-      Type: other
+      Type: bool
       Process Configuration Parameter:
         Actions:
         - config change
@@ -32,7 +32,7 @@ File:
         - value change
         Desc: device description
   - Record Count:
-      Type: other
+      Type: number
       Process Configuration Parameter:
         Actions:
         - value change

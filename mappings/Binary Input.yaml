@@ -26,8 +26,9 @@ Binary Input:
         Desc: writing to attribute implies override action
   - Status Flags:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 4
       Device Diagnostics:
         Actions:
         - value change
@@ -59,8 +60,9 @@ Binary Input:
         Desc: device description
   - Event Enable:
       Type:
-        Name: list
+        Name: array
         Element Type: bool
+        Length: 3
       Alarm Suppression:
         Actions:
         - activate/deactivate
@@ -75,6 +77,7 @@ Binary Input:
       Type:
         Name: object
         Element Type: Notification Class
+        Key: Notification Class
   - Notify Type:
       Type: bool
       Alarm Suppression:
@@ -82,7 +85,7 @@ Binary Input:
         - activate/deactivate
         Desc: toggles between event and alarm types for notifications
   - Reliability:
-      Type: other
+      Type: enum
       Process Input Variable:
         Actions:
         - config change

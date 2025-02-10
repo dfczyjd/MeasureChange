@@ -303,7 +303,7 @@ def handle_read_patch(self):
         msg, addr = self.socket.recvfrom(65536)
         if _debug: UDPDirector._debug("    - received %d octets from %s", len(msg), addr)
 
-        if config.enable_capture and config.capture_target_ip == addr[0]:
+        if config.enable_capture and addr[0] in config.capture_target_ip:
             try:
                 packet = udp_template % \
                     ((len(msg) + 28).to_bytes(2, 'big'),    # IP packet length
@@ -341,7 +341,7 @@ def handle_write_patch(self):
     try:
         pdu = self.request.get()
 
-        if config.enable_capture and config.capture_target_ip == pdu.pduDestination[0]:
+        if config.enable_capture and pdu.pduDestination[0] in config.capture_target_ip:
             try:
                 packet = udp_template % \
                         ((len(pdu.pduData) + 28).to_bytes(2, 'big'),    # IP packet length

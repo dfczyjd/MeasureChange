@@ -1,0 +1,64 @@
+<html>
+<head>
+    <style>
+        ul, #myUL {
+          list-style-type: none;
+        }
+        
+        #myUL {
+          margin: 0;
+          padding: 0;
+        }
+        
+        .caret {
+          cursor: pointer;
+          user-select: none;
+        }
+        
+        .caret::before {
+          content: "\25B6";
+          color: black;
+          display: inline-block;
+          margin-right: 6px;
+        }
+        
+        .caret-down::before {
+          transform: rotate(90deg);
+        }
+        
+        .nested {
+          display: none;
+        }
+        
+        .active {
+          display: block;
+        }
+    </style>
+</head>
+<body>
+    <form action="/array" method="GET">
+        <select name="prop">
+            {% for prop in props %}
+            <option value={{ prop }} {% if prop_name == prop %} selected {% endif %}>{{ prop }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Display"/>
+    </form>
+    {% if results %}
+    Displaying all {{ prop_name }}<br/>
+    <img src="/static/diagram.png"/>
+    <script>
+      var toggler = document.getElementsByClassName("caret");
+      var i;
+      
+      for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", function() {
+          console.log("Click");
+          this.parentElement.querySelector(".nested").classList.toggle("active");
+          this.classList.toggle("caret-down");
+        });
+      }
+    </script>
+    {% endif %}
+</body>
+</html>

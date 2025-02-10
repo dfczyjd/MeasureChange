@@ -1,0 +1,4 @@
+line
+another line
+not a record
+a record, not a line
