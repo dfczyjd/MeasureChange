@@ -1,4 +1,5 @@
-# Measuring change in ICS
+# Measuring change in BAS
+Repository for scripts used during the execution of Master thesis "Investigation of Building Automation Cyber-Physical Systems to create a process for measuring the impact of change on IDS". See corresponding thesis for more information.
 
 ## Repository contents
 * mapping: mappings of object properties to change types
@@ -27,3 +28,5 @@
   * file_reader.py: script to read files from devices (requires config.py and data from database specified in it)
 * mwe: minimal working example of the probing script
   * See mwe/README.md for more information
+* analysis: scripts used in the analysis process
+  * See analysis/README.md for more information
